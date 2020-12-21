@@ -6,6 +6,14 @@ metadata:
   labels:
     team: teamsykmelding
 spec:
+  gcp:
+    sqlInstances:
+      - name: sykmeldinger-arbeidsgiver-instance
+        type: POSTGRES_12
+        diskSize: 10
+        databases:
+          - name: sykmeldinger-arbeidsgiver
+            envVarPrefix: NAIS_DATABASE
   image: {{ image }}
   replicas:
     min: 2
