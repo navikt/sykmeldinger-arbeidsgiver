@@ -7,6 +7,17 @@ metadata:
     team: teamsykmelding
 spec:
   image: {{ image }}
+  gcp:
+    sqlInstances:
+      - name: sykmeldinger-arbeidsgiver-instance
+        type: POSTGRES_12
+        diskSize: 10
+        tier: db-custom-1-3840
+        diskAutoresize: true
+        highAvailability: true
+        databases:
+          - name: sykmeldinger-arbeidsgiver
+            envVarPrefix: NAIS_DATABASE
   replicas:
     min: 2
     max: 6
