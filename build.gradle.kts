@@ -19,7 +19,7 @@ val nimbusdsVersion = "9.2"
 val testContainerKafkaVersion = "1.15.1"
 val flywayVersion = "5.2.4"
 val hikariVersion = "3.3.0"
-
+val postgresVersion = "42.2.18"
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
 }
@@ -81,7 +81,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-
+    implementation("org.postgresql:postgresql:$postgresVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
