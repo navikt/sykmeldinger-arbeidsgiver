@@ -8,7 +8,7 @@ version = "1.0.0"
 val coroutinesVersion = "1.4.2"
 val jacksonVersion = "2.12.0"
 val kluentVersion = "1.61"
-val ktorVersion = "1.4.3"
+val ktorVersion = "1.5.0"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "6.5"
 val prometheusVersion = "0.9.0"
@@ -17,7 +17,9 @@ val smCommonVersion = "1.836b169"
 val mockkVersion = "1.10.3"
 val nimbusdsVersion = "9.2"
 val testContainerKafkaVersion = "1.15.1"
-
+val flywayVersion = "5.2.4"
+val hikariVersion = "3.3.0"
+val postgresVersion = "42.2.18"
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
 }
@@ -77,14 +79,16 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-
-    testImplementation("org.amshove.kluent:kluent:$kluentVersion") 
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.postgresql:postgresql:$postgresVersion")
+    testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
     testImplementation("org.testcontainers:kafka:$testContainerKafkaVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
-        exclude(group = "org.eclipse.jetty") 
+        exclude(group = "org.eclipse.jetty")
     }
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
