@@ -9,7 +9,7 @@ import org.flywaydb.core.Flyway
 import java.net.ConnectException
 import java.sql.Connection
 
-class database(private val env: Environment, retries: Long = 30, sleepTime: Long = 1_000) : DatabaseInterface {
+class Database(private val env: Environment, retries: Long = 30, sleepTime: Long = 1_000) : DatabaseInterface {
     private val dataSource: HikariDataSource
     override val connection: Connection
         get() = dataSource.connection
