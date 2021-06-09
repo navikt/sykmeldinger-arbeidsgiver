@@ -5,6 +5,7 @@ import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.ServerResponseException
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.http.HttpHeaders
 import no.nav.syfo.log
 import no.nav.syfo.narmesteleder.client.model.Ansatt
@@ -13,8 +14,9 @@ import no.nav.syfo.narmesteleder.client.model.AnsatteResponse
 class NarmestelederClient(val httpClient: HttpClient, val url: String) {
     suspend fun getAnsatte(bearerToken: String): List<Ansatt> {
         return try {
-            val response = httpClient.get<AnsatteResponse>(url) {
+            val response = httpClient.get<AnsatteResponse>("$url/arbeidsgiver/ansatte") {
                 header(HttpHeaders.Authorization, bearerToken)
+                parameter("status", "ACTIVE")
             }
             response.ansatte
         } catch (ex: ClientRequestException) {
