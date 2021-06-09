@@ -68,11 +68,12 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
 }
 
 fun DatabaseInterface.getSykmeldinger(fnrs: List<String>): List<ArbeidsgiverSykmelding> {
-    return connection.use {
-        it.prepareStatement("""SELECT * FROM sykmelding where pasient_fnr = ANY (?)""").use {
-            it.setArray(1, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
-            it.executeQuery().toList { toArbeidsgiverSykmelding() }
-        }
+    return connection.use { connection ->
+        connection.prepareStatement("""SELECT * FROM sykmelding where pasient_fnr = ANY (?)""")
+            .use {
+                it.setArray(1, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
+                it.executeQuery().toList { toArbeidsgiverSykmelding() }
+            }
     }
 }
 

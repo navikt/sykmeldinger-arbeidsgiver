@@ -55,6 +55,11 @@ class SykmeldingDbKtTest : Spek({
         }
         it("get empty list") {
             val sykmeldinger = database.getSykmeldinger(listOf("12345678900"))
+            (0 until 100).forEach {
+                database.getSykmeldinger(listOf("12345678900"))
+                database.getSykmeldinger(listOf("12345678900"))
+            }
+
             sykmeldinger.size shouldBeEqualTo 0
         }
     }
