@@ -8,8 +8,6 @@ import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.ResultSet
 import java.sql.Timestamp
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 
 private fun toPGObject(obj: Any) = PGobject().also {
     it.type = "json"
@@ -71,7 +69,7 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
 
 fun DatabaseInterface.getSykmeldinger(fnrs: List<String>): List<ArbeidsgiverSykmelding> {
     return connection.use {
-        it.prepareStatement("""SELECT * FROM sykmelding where pasient_fnr in ?""").use {
+        it.prepareStatement("""SELECT * FROM sykmelding where pasient_fnr = ANY (?)""").use {
             it.setArray(1, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
             it.executeQuery().toList { toArbeidsgiverSykmelding() }
         }
