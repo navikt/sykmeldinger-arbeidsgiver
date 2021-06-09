@@ -72,8 +72,7 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
 fun DatabaseInterface.getSykmeldinger(fnrs: List<String>): List<ArbeidsgiverSykmelding> {
     return connection.use {
         it.prepareStatement("""SELECT * FROM sykmelding where fnr in ?""").use {
-            it.setTimestamp(1, Timestamp.from(OffsetDateTime.now(ZoneOffset.UTC).minusMonths(4).toInstant()))
-            it.setArray(2, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
+            it.setArray(1, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
             it.executeQuery().toList { toArbeidsgiverSykmelding() }
         }
     }
