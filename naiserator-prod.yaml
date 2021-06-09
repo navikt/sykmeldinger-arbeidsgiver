@@ -6,6 +6,9 @@ metadata:
   labels:
     team: teamsykmelding
 spec:
+  accessPolicy:
+    outbound:
+      - application: narmesteleder
   image: {{ image }}
   gcp:
     sqlInstances:
