@@ -71,7 +71,7 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
 
 fun DatabaseInterface.getSykmeldinger(fnrs: List<String>): List<ArbeidsgiverSykmelding> {
     return connection.use {
-        it.prepareStatement("""SELECT * FROM sykmelding where fnr in ?""").use {
+        it.prepareStatement("""SELECT * FROM sykmelding where pasient_fnr in ?""").use {
             it.setArray(1, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
             it.executeQuery().toList { toArbeidsgiverSykmelding() }
         }
