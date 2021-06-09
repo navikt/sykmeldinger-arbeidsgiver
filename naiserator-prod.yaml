@@ -51,6 +51,7 @@ spec:
   vault:
     enabled: false
   ingresses:
+    - "https://sykmeldinger-arbeidsgiver.nav.no"
     - "https://sykmeldinger-arbeidsgiver.intern.nav.no"
   webproxy: true
   envFrom:

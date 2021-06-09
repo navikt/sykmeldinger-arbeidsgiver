@@ -40,15 +40,16 @@ spec:
     path: /prometheus
   resources:
     limits:
-      cpu: 500m
+      cpu: 2048m
       memory: 1Gi
     requests:
-      cpu: 400m
+      cpu: 1024m
       memory: 768Mi
   vault:
     enabled: false
   ingresses:
     - "https://sykmeldinger-arbeidsgiver.dev.intern.nav.no"
+    - "https://sykmeldinger-arbeidsgiver.dev.nav.no"
   webproxy: true
   envFrom:
     - secret: sykmeldinger-arbeidsgiver-secrets
