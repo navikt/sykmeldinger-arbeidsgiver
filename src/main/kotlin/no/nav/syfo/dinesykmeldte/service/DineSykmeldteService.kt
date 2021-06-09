@@ -1,28 +1,42 @@
 package no.nav.syfo.dinesykmeldte.service
 
-import no.nav.syfo.dinesykmeldte.model.DineSykmeldteSykmelding
+import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.dinesykmeldte.util.toDineSykmeldteSykmelding
 import no.nav.syfo.narmesteleder.client.NarmestelederClient
-import no.nav.syfo.narmesteleder.client.model.Ansatt
 import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.model.ArbeidsgiverSykmelding
 import java.time.LocalDate
+
+data class ArbeidsgiverKey(
+    val fnr: String,
+    val orgnummer: String
+)
 
 class DineSykmeldteService(
     val narmestelederClient: NarmestelederClient,
     val sykmeldingService: SykmeldingService
 ) {
-    suspend fun getDineSykmeldte(bearerToken: String): Map<Ansatt, List<DineSykmeldteSykmelding>?> {
-        val ansatte = narmestelederClient.getAnsatte(bearerToken).distinctBy { it.narmestelederId }
-        val arbeidsgiverSykmelding = getArbeidsgiversSykmeldinger(ansatte).groupBy { it.pasient.fnr }
+    suspend fun getDineSykmeldte(bearerToken: String): List<Sykmeldt> {
+        val ansatte = narmestelederClient.getAnsatte(bearerToken).distinctBy { it.narmestelederId }.groupBy { ArbeidsgiverKey(it.fnr, it.orgnummer) }.mapValues { it.value.first() }
+        val arbeidsgiverSykmelding = getArbeidsgiversSykmeldinger(ansatte.keys.map { it.fnr }.distinct()).groupBy { ArbeidsgiverKey(it.pasientFnr, it.orgnummer) }
 
-        return ansatte.associateWith { ansatt -> arbeidsgiverSykmelding[ansatt.fnr] }
+        return arbeidsgiverSykmelding.map { entry ->
+            when (val ansatt = ansatte[entry.key]) {
+                null -> null
+                else -> Sykmeldt(
+                    narmestelederId = ansatt.narmestelederId.toString(),
+                    orgnummer = ansatt.orgnummer,
+                    fnr = ansatt.fnr,
+                    navn = ansatt.navn,
+                    sykmeldinger = entry.value.map { it.toDineSykmeldteSykmelding(ansatt) }
+                )
+            }
+        }.filterNotNull()
     }
 
-    private fun getArbeidsgiversSykmeldinger(ansatte: List<Ansatt>): List<DineSykmeldteSykmelding> {
-        return sykmeldingService.getSykmeldinger(ansatte.map { it.fnr })
+    private fun getArbeidsgiversSykmeldinger(fnr: List<String>): List<ArbeidsgiverSykmelding> {
+        return sykmeldingService.getSykmeldinger(fnr)
             .filter { filterOutOldSykmeldinger(it) }
-            .map { it.toDineSykmeldteSykmelding(ansatte.first { ansatt -> ansatt.fnr == it.pasientFnr }) }
     }
 
     private fun filterOutOldSykmeldinger(it: ArbeidsgiverSykmelding) =
