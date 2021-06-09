@@ -15,8 +15,11 @@ data class Environment(
     override val kafkaBootstrapServers: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS_URL"),
     override val truststore: String? = getEnvVar("NAV_TRUSTSTORE_PATH"),
     override val truststorePassword: String? = getEnvVar("NAV_TRUSTSTORE_PASSWORD"),
-    val syfoSendtSykmeldingTopic: String = "syfo-sendt-sykmelding"
-
+    val syfoSendtSykmeldingTopic: String = "syfo-sendt-sykmelding",
+    val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
+    val loginserviceIdportenAudience: List<String> = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
+    val allowedOrigin: String = getEnvVar("ALLOWED_ORIGIN"),
+    val narmestelederUrl: String = getEnvVar("NARMESTELEDER_URL"),
 ) : KafkaConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$dbHost:$dbPort/$dbName"

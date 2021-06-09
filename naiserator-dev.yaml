@@ -48,6 +48,11 @@ spec:
   webproxy: true
   envFrom:
     - secret: sykmeldinger-arbeidsgiver-secrets
+    - configmap: loginservice-idporten
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
       value: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
+    - name: NARMESTELEDER_URL
+      value: https://narmesteleder.dev.intern.nav.no
+    - name: ALLOWED_ORIGIN
+      value: tjenester-q1.nav.no
