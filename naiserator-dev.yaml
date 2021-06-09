@@ -8,7 +8,8 @@ metadata:
 spec:
   accessPolicy:
     outbound:
-      - application: narmesteleder
+      rules:
+        - application: narmesteleder
   gcp:
     sqlInstances:
       - name: sykmeldinger-arbeidsgiver-instance
