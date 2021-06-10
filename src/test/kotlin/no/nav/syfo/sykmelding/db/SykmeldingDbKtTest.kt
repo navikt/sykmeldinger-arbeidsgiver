@@ -81,58 +81,60 @@ fun getSykmeldingSendtMessage(): SendtSykmeldingKafkaMessage {
         kafkaMetadata = KafkaMetadataDTO(
             "213", OffsetDateTime.now(), fnr = "12345678901", source = "user"
         ),
-        sykmelding = EnkelSykmelding(
-            id = "123",
-            mottattTidspunkt = OffsetDateTime.now(),
-            legekontorOrgnummer = "123456789",
-            behandletTidspunkt = OffsetDateTime.now(),
-            meldingTilArbeidsgiver = "",
-            navnFastlege = null,
-            tiltakArbeidsplassen = "",
-            syketilfelleStartDato = null,
-            behandler = BehandlerDTO(
-                fornavn = "fornavn",
-                mellomnavn = null,
-                etternavn = "etternavn",
-                aktoerId = "aktorId",
-                fnr = "legefnr",
-                hpr = null,
-                her = null,
-                adresse = AdresseDTO(null, null, null, null, null),
-                tlf = null
-            ),
-            sykmeldingsperioder = listOf(
-                SykmeldingsperiodeDTO(
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
-                    gradert = null,
-                    behandlingsdager = null,
-                    innspillTilArbeidsgiver = null,
-                    type = PeriodetypeDTO.AKTIVITET_IKKE_MULIG,
-                    aktivitetIkkeMulig = null,
-                    reisetilskudd = false
-                )
-            ),
-            arbeidsgiver = ArbeidsgiverDTO(
-                navn = "arbeidsgiver",
-                stillingsprosent = 100
-            ),
-            kontaktMedPasient = KontaktMedPasientDTO(
-                kontaktDato = LocalDate.now(),
-                begrunnelseIkkeKontakt = null
-            ),
-            prognose = PrognoseDTO(
-                arbeidsforEtterPeriode = true,
-                hensynArbeidsplassen = null,
-                erIArbeid = ErIArbeidDTO(
-                    false, false, null, null
-                ),
-                erIkkeIArbeid = null
-            ),
-            egenmeldt = false,
-            papirsykmelding = false,
-            harRedusertArbeidsgiverperiode = false,
-            merknader = emptyList()
-        )
+        sykmelding = enkelSykmelding()
     )
 }
+
+fun enkelSykmelding() = EnkelSykmelding(
+    id = "123",
+    mottattTidspunkt = OffsetDateTime.now(),
+    legekontorOrgnummer = "123456789",
+    behandletTidspunkt = OffsetDateTime.now(),
+    meldingTilArbeidsgiver = "",
+    navnFastlege = null,
+    tiltakArbeidsplassen = "",
+    syketilfelleStartDato = null,
+    behandler = BehandlerDTO(
+        fornavn = "fornavn",
+        mellomnavn = null,
+        etternavn = "etternavn",
+        aktoerId = "aktorId",
+        fnr = "legefnr",
+        hpr = null,
+        her = null,
+        adresse = AdresseDTO(null, null, null, null, null),
+        tlf = null
+    ),
+    sykmeldingsperioder = listOf(
+        SykmeldingsperiodeDTO(
+            fom = LocalDate.now(),
+            tom = LocalDate.now(),
+            gradert = null,
+            behandlingsdager = null,
+            innspillTilArbeidsgiver = null,
+            type = PeriodetypeDTO.AKTIVITET_IKKE_MULIG,
+            aktivitetIkkeMulig = null,
+            reisetilskudd = false
+        )
+    ),
+    arbeidsgiver = ArbeidsgiverDTO(
+        navn = "arbeidsgiver",
+        stillingsprosent = 100
+    ),
+    kontaktMedPasient = KontaktMedPasientDTO(
+        kontaktDato = LocalDate.now(),
+        begrunnelseIkkeKontakt = null
+    ),
+    prognose = PrognoseDTO(
+        arbeidsforEtterPeriode = true,
+        hensynArbeidsplassen = null,
+        erIArbeid = ErIArbeidDTO(
+            false, false, null, null
+        ),
+        erIkkeIArbeid = null
+    ),
+    egenmeldt = false,
+    papirsykmelding = false,
+    harRedusertArbeidsgiverperiode = false,
+    merknader = emptyList()
+)

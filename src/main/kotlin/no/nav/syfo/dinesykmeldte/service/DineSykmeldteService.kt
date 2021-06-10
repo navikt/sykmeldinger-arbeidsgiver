@@ -13,8 +13,8 @@ data class ArbeidsgiverKey(
 )
 
 class DineSykmeldteService(
-    val narmestelederClient: NarmestelederClient,
-    val sykmeldingService: SykmeldingService
+    private val narmestelederClient: NarmestelederClient,
+    private val sykmeldingService: SykmeldingService
 ) {
     suspend fun getDineSykmeldte(bearerToken: String): List<Sykmeldt> {
         val ansatte = narmestelederClient.getAnsatte(bearerToken).distinctBy { it.narmestelederId }.groupBy { ArbeidsgiverKey(it.fnr, it.orgnummer) }.mapValues { it.value.first() }
