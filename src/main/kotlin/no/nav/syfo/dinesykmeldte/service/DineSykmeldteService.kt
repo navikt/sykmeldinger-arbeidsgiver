@@ -41,4 +41,21 @@ class DineSykmeldteService(
 
     private fun filterOutOldSykmeldinger(it: ArbeidsgiverSykmelding) =
         it.sykmelding.sykmeldingsperioder.maxOf { periode -> periode.tom } >= LocalDate.now().minusMonths(4)
+
+    suspend fun getSykmeldt(narmestelederId: String, bearerToken: String): Sykmeldt? {
+        val ansatt = narmestelederClient.getAnsatt(narmestelederId, bearerToken)
+        return when (ansatt) {
+            null -> null
+            else -> {
+                val sykmeldinger = sykmeldingService.getSykmeldinger(listOf(ansatt.fnr)).filter { it.orgnummer === ansatt.orgnummer }
+                return Sykmeldt(
+                    narmestelederId = narmestelederId,
+                    orgnummer = ansatt.orgnummer,
+                    fnr = ansatt.fnr,
+                    navn = ansatt.navn,
+                    sykmeldinger = sykmeldinger.map { it.toDineSykmeldteSykmelding(ansatt) }
+                )
+            }
+        }
+    }
 }

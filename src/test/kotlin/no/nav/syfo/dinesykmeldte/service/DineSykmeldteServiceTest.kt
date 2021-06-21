@@ -8,7 +8,9 @@ import no.nav.syfo.narmesteleder.client.model.Ansatt
 import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.db.enkelSykmelding
 import no.nav.syfo.sykmelding.model.ArbeidsgiverSykmelding
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBe
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.UUID
@@ -72,6 +74,36 @@ class DineSykmeldteServiceTest : Spek({
             runBlocking {
                 val sykmeldinger = dineSykmeldteService.getDineSykmeldte("token")
                 sykmeldinger.size shouldBeEqualTo 2
+            }
+        }
+        it("Should get one ansatt") {
+            val nlId = UUID.randomUUID()
+            coEvery { narmestelederClient.getAnsatt(nlId.toString(), "token") } returns Ansatt("1", "navn", "3", nlId)
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", enkelSykmelding()))
+            runBlocking {
+                val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
+                sykmeldt shouldNotBe null
+                sykmeldt!!.sykmeldinger.size shouldBeEqualTo 1
+            }
+        }
+
+        it("Should get one ansatt, filter out other sykmeldinger") {
+            val nlId = UUID.randomUUID()
+            coEvery { narmestelederClient.getAnsatt(nlId.toString(), "token") } returns Ansatt("1", "navn", "2", nlId)
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", enkelSykmelding()))
+            runBlocking {
+                val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
+                sykmeldt shouldNotBe null
+                sykmeldt!!.sykmeldinger.size shouldBeEqualTo 0
+            }
+        }
+
+        it("Should get null for ansatt") {
+            val nlId = UUID.randomUUID()
+            coEvery { narmestelederClient.getAnsatt(nlId.toString(), "token") } returns null
+            runBlocking {
+                val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
+                sykmeldt shouldBe null
             }
         }
     }
