@@ -30,7 +30,7 @@ class NarmestelederClient(val httpClient: HttpClient, val url: String) {
 
     suspend fun getAnsatt(narmestelederId: String, bearerToken: String): Ansatt? {
         return try {
-            return httpClient.get("$url/arbeidsgiver/ansatte/$narmestelederId") {
+            return httpClient.get("$url/arbeidsgiver/ansatt/$narmestelederId") {
                 header(HttpHeaders.Authorization, bearerToken)
             }
         } catch (ex: ClientRequestException) {
