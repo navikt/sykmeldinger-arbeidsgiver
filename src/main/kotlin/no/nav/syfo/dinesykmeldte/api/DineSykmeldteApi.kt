@@ -14,7 +14,7 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
         call.respond(dineSykmeldteService.getDineSykmeldte(token))
     }
 
-    get("dinesykmeldte/{narmestelederId") {
+    get("dinesykmeldte/{narmestelederId}") {
         val token = "Bearer ${call.getToken()}"
         val narmestelederId = call.parameters["narmestelederId"]!!
         when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, token)) {
