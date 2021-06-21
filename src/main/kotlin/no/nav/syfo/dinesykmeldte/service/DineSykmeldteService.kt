@@ -47,7 +47,7 @@ class DineSykmeldteService(
         return when (ansatt) {
             null -> null
             else -> {
-                val sykmeldinger = sykmeldingService.getSykmeldinger(listOf(ansatt.fnr)).filter { it.orgnummer === ansatt.orgnummer }
+                val sykmeldinger = sykmeldingService.getSykmeldinger(listOf(ansatt.fnr)).filter { it.orgnummer == ansatt.orgnummer }
                 return Sykmeldt(
                     narmestelederId = narmestelederId,
                     orgnummer = ansatt.orgnummer,
