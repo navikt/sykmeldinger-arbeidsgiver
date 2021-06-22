@@ -27,6 +27,8 @@ import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.kafka.SykmeldingConsumer
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
 import no.nav.syfo.sykmelding.kafka.util.JacksonKafkaDeserializer
+import org.apache.kafka.clients.CommonClientConfigs
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.Logger
@@ -79,9 +81,10 @@ fun main() {
 
     val kafkaCredentials = env.kafkaCredentials()
     val properties = loadBaseConfig(env, kafkaCredentials).toConsumerConfig(
-        env.applicationName + "-consumer",
+        env.applicationName + "-consumer-v2",
         JacksonKafkaDeserializer::class
     )
+    properties[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
     val kafkaConsumer =
         KafkaConsumer(properties, StringDeserializer(), JacksonKafkaDeserializer(SendtSykmeldingKafkaMessage::class))
 

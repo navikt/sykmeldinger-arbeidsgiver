@@ -53,6 +53,13 @@ class SykmeldingDbKtTest : Spek({
             val sykmeldinger = database.getSykmeldinger(listOf("12345678901"))
             sykmeldinger.size shouldBeEqualTo 1
         }
+        it("Test updating") {
+            val sykmelding = getSykmeldingSendtMessage()
+            database.insertOrUpdateSykmelding(sykmelding)
+            database.insertOrUpdateSykmelding(getSykmeldingSendtMessage().copy(event = sykmelding.event.copy(arbeidsgiver = sykmelding.event.arbeidsgiver!!.copy(orgNavn = "TEST"))))
+            val sykmeldinger = database.getSykmeldinger(listOf("12345678901"))
+            sykmeldinger[0].orgNavn shouldBeEqualTo "TEST"
+        }
         it("get empty list") {
             val sykmeldinger = database.getSykmeldinger(listOf("12345678900"))
             (0 until 100).forEach {
