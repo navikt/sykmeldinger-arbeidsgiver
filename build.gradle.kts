@@ -16,7 +16,7 @@ val spekVersion = "2.0.9"
 val smCommonVersion = "1.836b169"
 val mockkVersion = "1.10.3"
 val nimbusdsVersion = "9.2"
-val testContainerKafkaVersion = "1.15.1"
+val testContainerVersion = "1.15.3"
 val flywayVersion = "5.2.4"
 val hikariVersion = "3.3.0"
 val postgresVersion = "42.2.18"
@@ -88,7 +88,8 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
-    testImplementation("org.testcontainers:kafka:$testContainerKafkaVersion")
+    testImplementation("org.testcontainers:kafka:$testContainerVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainerVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }

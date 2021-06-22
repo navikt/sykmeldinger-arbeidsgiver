@@ -1,9 +1,12 @@
 package no.nav.syfo.sykmelding.db
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
+import no.nav.syfo.sykmelding.model.ArbeidsgiverSykmelding
 import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
+import java.sql.ResultSet
 import java.sql.Timestamp
 
 private fun toPGObject(obj: Any) = PGobject().also {
@@ -61,5 +64,30 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
             ps.execute()
         }
         it.commit()
+    }
+}
+
+fun DatabaseInterface.getSykmeldinger(fnrs: List<String>): List<ArbeidsgiverSykmelding> {
+    return connection.use { connection ->
+        connection.prepareStatement("""SELECT * FROM sykmelding where pasient_fnr = ANY (?)""")
+            .use {
+                it.setArray(1, connection.createArrayOf("VARCHAR", fnrs.toTypedArray()))
+                it.executeQuery().toList { toArbeidsgiverSykmelding() }
+            }
+    }
+}
+
+fun ResultSet.toArbeidsgiverSykmelding(): ArbeidsgiverSykmelding {
+    return ArbeidsgiverSykmelding(
+        pasientFnr = getString("pasient_fnr"),
+        orgnummer = getString("orgnummer"),
+        juridiskOrgnummer = getString("juridisk_orgnummer"),
+        sykmelding = objectMapper.readValue(getString("sykmelding"))
+    )
+}
+
+fun <T> ResultSet.toList(mapper: ResultSet.() -> T): List<T> = mutableListOf<T>().apply {
+    while (next()) {
+        add(mapper())
     }
 }

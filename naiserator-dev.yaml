@@ -6,6 +6,10 @@ metadata:
   labels:
     team: teamsykmelding
 spec:
+  accessPolicy:
+    outbound:
+      rules:
+        - application: narmesteleder
   gcp:
     sqlInstances:
       - name: sykmeldinger-arbeidsgiver-instance
@@ -36,18 +40,24 @@ spec:
     path: /prometheus
   resources:
     limits:
-      cpu: 500m
+      cpu: 2048m
       memory: 1Gi
     requests:
-      cpu: 400m
+      cpu: 1024m
       memory: 768Mi
   vault:
     enabled: false
   ingresses:
     - "https://sykmeldinger-arbeidsgiver.dev.intern.nav.no"
+    - "https://sykmeldinger-arbeidsgiver.dev.nav.no"
   webproxy: true
   envFrom:
     - secret: sykmeldinger-arbeidsgiver-secrets
+    - configmap: loginservice-idporten
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
       value: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
+    - name: NARMESTELEDER_URL
+      value: https://narmesteleder.dev.nav.no
+    - name: ALLOWED_ORIGIN
+      value: tjenester-q1.nav.no
