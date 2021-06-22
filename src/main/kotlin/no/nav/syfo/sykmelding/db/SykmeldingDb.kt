@@ -37,7 +37,7 @@ fun DatabaseInterface.insertOrUpdateSykmelding(sendtSykmeldingKafkaMessage: Send
             val sykmelding = toPGObject(sendtSykmeldingKafkaMessage.sykmelding)
             val orgnavn = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.orgNavn
             var index = 1
-            //INSERT
+            // INSERT
             ps.setString(index++, sykmeldingId)
             ps.setString(index++, pasientFnr)
             ps.setString(index++, orgnummer)
@@ -45,7 +45,7 @@ fun DatabaseInterface.insertOrUpdateSykmelding(sendtSykmeldingKafkaMessage: Send
             ps.setTimestamp(index++, timestamp)
             ps.setObject(index++, sykmelding)
             ps.setString(index++, orgnavn)
-            //UPDATE
+            // UPDATE
             ps.setString(index++, pasientFnr)
             ps.setString(index++, orgnummer)
             ps.setString(index++, juridiskOrgnummer)

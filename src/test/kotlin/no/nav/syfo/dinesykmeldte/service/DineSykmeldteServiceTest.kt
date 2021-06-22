@@ -44,7 +44,7 @@ class DineSykmeldteServiceTest : Spek({
 
         it("Get sykmeldinger for ansatt") {
             coEvery { narmestelederClient.getAnsatte("token") } returns listOf(Ansatt("1", "navn", "2", UUID.randomUUID()))
-            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "2", "3", "navn",enkelSykmelding()))
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "2", "3", "navn", enkelSykmelding()))
 
             runBlocking {
                 val sykmeldinger = dineSykmeldteService.getDineSykmeldte("token")
@@ -54,7 +54,7 @@ class DineSykmeldteServiceTest : Spek({
 
         it("Should filter out sykmeldinger on different orgnr") {
             coEvery { narmestelederClient.getAnsatte("token") } returns listOf(Ansatt("1", "navn", "2", UUID.randomUUID()))
-            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", "navn",enkelSykmelding()))
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", "navn", enkelSykmelding()))
 
             runBlocking {
                 val sykmeldinger = dineSykmeldteService.getDineSykmeldte("token")
@@ -67,8 +67,8 @@ class DineSykmeldteServiceTest : Spek({
                 Ansatt("2", "navn", "2", UUID.randomUUID())
             )
             coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(
-                ArbeidsgiverSykmelding("1", "2", "3", "navn",  enkelSykmelding()),
-                ArbeidsgiverSykmelding("2", "2", "4", "navn",enkelSykmelding())
+                ArbeidsgiverSykmelding("1", "2", "3", "navn", enkelSykmelding()),
+                ArbeidsgiverSykmelding("2", "2", "4", "navn", enkelSykmelding())
             )
 
             runBlocking {

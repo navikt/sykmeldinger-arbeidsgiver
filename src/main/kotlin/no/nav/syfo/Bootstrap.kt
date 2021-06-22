@@ -27,7 +27,6 @@ import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.kafka.SykmeldingConsumer
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
 import no.nav.syfo.sykmelding.kafka.util.JacksonKafkaDeserializer
-import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.serialization.StringDeserializer
