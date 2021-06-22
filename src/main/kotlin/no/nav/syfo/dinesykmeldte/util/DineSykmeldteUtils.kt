@@ -39,9 +39,8 @@ fun ArbeidsgiverSykmelding.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
         friskmelding = Friskmelding(
             arbeidsfoerEtterPerioden = this.sykmelding.prognose?.arbeidsforEtterPeriode,
             hensynPaaArbeidsplassen = this.sykmelding.prognose?.hensynArbeidsplassen,
-            antarReturAnnenArbeidsgiver = this.sykmelding.prognose?.erIArbeid?.annetArbeidPaSikt ?: false,
             antattDatoReturSammeArbeidsgiver = this.sykmelding.prognose?.erIArbeid?.arbeidFOM,
-            antarReturSammeArbeidsgiver = this.sykmelding.prognose?.erIArbeid?.egetArbeidPaSikt ?: false
+            antarReturSammeArbeidsgiver = this.sykmelding.prognose?.erIArbeid?.egetArbeidPaSikt
         )
     )
 }
@@ -76,7 +75,7 @@ private fun SykmeldingsperiodeDTO.toPerioder(): Periode {
     return Periode(
         fom = this.fom,
         tom = this.tom,
-        grad = this.gradert?.grad,
+        grad = this.gradert?.grad ?: 100,
         behandlingsdager = this.behandlingsdager,
         reisetilskudd = this.reisetilskudd,
         avventende = this.innspillTilArbeidsgiver,
