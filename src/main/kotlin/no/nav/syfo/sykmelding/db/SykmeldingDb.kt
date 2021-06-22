@@ -18,14 +18,15 @@ fun DatabaseInterface.insertOrUpdateSykmelding(sendtSykmeldingKafkaMessage: Send
     connection.use {
         it.prepareStatement(
             """
-             INSERT INTO sykmelding(sykmelding_id, pasient_fnr, orgnummer, juridisk_orgnummer, timestamp, sykmelding) 
-                    values (?, ?, ?, ?, ?, ?)
+             INSERT INTO sykmelding(sykmelding_id, pasient_fnr, orgnummer, juridisk_orgnummer, timestamp, sykmelding, orgnavn) 
+                    values (?, ?, ?, ?, ?, ?, ?)
                 on conflict (sykmelding_id) do update 
                     set pasient_fnr = ?,
                         orgnummer = ?,
                         juridisk_orgnummer = ?,
                         timestamp = ?,
-                        sykmelding =?
+                        sykmelding =?,
+                        orgnavn = ?
          """
         ).use { ps ->
             val sykmeldingId = sendtSykmeldingKafkaMessage.sykmelding.id
@@ -34,19 +35,23 @@ fun DatabaseInterface.insertOrUpdateSykmelding(sendtSykmeldingKafkaMessage: Send
             val juridiskOrgnummer = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.juridiskOrgnummer
             val timestamp = Timestamp.from(sendtSykmeldingKafkaMessage.event.timestamp.toInstant())
             val sykmelding = toPGObject(sendtSykmeldingKafkaMessage.sykmelding)
-
+            val orgnavn = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.orgNavn
             var index = 1
+            // INSERT
             ps.setString(index++, sykmeldingId)
             ps.setString(index++, pasientFnr)
             ps.setString(index++, orgnummer)
             ps.setString(index++, juridiskOrgnummer)
             ps.setTimestamp(index++, timestamp)
             ps.setObject(index++, sykmelding)
+            ps.setString(index++, orgnavn)
+            // UPDATE
             ps.setString(index++, pasientFnr)
             ps.setString(index++, orgnummer)
             ps.setString(index++, juridiskOrgnummer)
             ps.setTimestamp(index++, timestamp)
-            ps.setObject(index, sykmelding)
+            ps.setObject(index++, sykmelding)
+            ps.setString(index, orgnavn)
             ps.execute()
         }
         it.commit()
@@ -82,6 +87,7 @@ fun ResultSet.toArbeidsgiverSykmelding(): ArbeidsgiverSykmelding {
         pasientFnr = getString("pasient_fnr"),
         orgnummer = getString("orgnummer"),
         juridiskOrgnummer = getString("juridisk_orgnummer"),
+        orgNavn = getString("orgnavn") ?: "",
         sykmelding = objectMapper.readValue(getString("sykmelding"))
     )
 }
