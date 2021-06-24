@@ -69,6 +69,14 @@ class SykmeldingDbKtTest : Spek({
 
             sykmeldinger.size shouldBeEqualTo 0
         }
+        it("Get correct orgName") {
+            val sykmelding = getSykmeldingSendtMessage()
+            val event = sykmelding.event.copy(arbeidsgiver = sykmelding.event.arbeidsgiver!!.copy(orgNavn = "CORRECT NAME"))
+            database.insertOrUpdateSykmelding(getSykmeldingSendtMessage().copy(event = event))
+
+            val saved = database.getSykmeldinger(listOf("12345678901")).first()
+            saved.orgNavn shouldBeEqualTo "CORRECT NAME"
+        }
     }
 })
 

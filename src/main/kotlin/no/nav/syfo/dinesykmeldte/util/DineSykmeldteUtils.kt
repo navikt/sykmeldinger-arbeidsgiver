@@ -25,7 +25,7 @@ fun ArbeidsgiverSykmelding.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
             aarsakAktivitetIkkeMulig434 = getAktivitetIkkeMuligBeskrivelse(this.sykmelding.sykmeldingsperioder)
         ),
         skalViseSkravertFelt = true,
-        arbeidsgiver = this.sykmelding.arbeidsgiver.navn,
+        arbeidsgiver = this.orgNavn,
         stillingsprosent = this.sykmelding.arbeidsgiver.stillingsprosent,
         innspillTilArbeidsgiver = this.sykmelding.meldingTilArbeidsgiver,
         arbeidsevne = Arbeidsevne(
