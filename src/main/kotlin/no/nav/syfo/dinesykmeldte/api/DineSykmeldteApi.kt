@@ -9,12 +9,12 @@ import no.nav.syfo.application.getToken
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 
 fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
-    get("dinesykmeldte") {
+    get("api/dinesykmeldte") {
         val token = "Bearer ${call.getToken()}"
         call.respond(dineSykmeldteService.getDineSykmeldte(token))
     }
 
-    get("dinesykmeldte/{narmestelederId}") {
+    get("api/dinesykmeldte/{narmestelederId}") {
         val token = "Bearer ${call.getToken()}"
         val narmestelederId = call.parameters["narmestelederId"]!!
         when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, token)) {
