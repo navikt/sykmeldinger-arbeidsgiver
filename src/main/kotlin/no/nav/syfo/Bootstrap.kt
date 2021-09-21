@@ -83,6 +83,7 @@ fun main() {
         env.applicationName + "-consumer-v2",
         JacksonKafkaDeserializer::class
     )
+    properties[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
     properties[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
     val kafkaConsumer =
         KafkaConsumer(properties, StringDeserializer(), JacksonKafkaDeserializer(SendtSykmeldingKafkaMessage::class))
