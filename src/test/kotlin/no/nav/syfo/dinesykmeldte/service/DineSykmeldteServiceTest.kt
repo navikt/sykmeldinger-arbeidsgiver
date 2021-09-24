@@ -83,7 +83,7 @@ class DineSykmeldteServiceTest : Spek({
             runBlocking {
                 val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
                 sykmeldt shouldNotBe null
-                sykmeldt!!.sykmeldinger.size shouldBeEqualTo 1
+                sykmeldt!!.sykmeldinger shouldBe null
             }
         }
 
@@ -93,8 +93,7 @@ class DineSykmeldteServiceTest : Spek({
             coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", "navn", enkelSykmelding()))
             runBlocking {
                 val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
-                sykmeldt shouldNotBe null
-                sykmeldt!!.sykmeldinger.size shouldBeEqualTo 0
+                sykmeldt shouldBe null
             }
         }
 

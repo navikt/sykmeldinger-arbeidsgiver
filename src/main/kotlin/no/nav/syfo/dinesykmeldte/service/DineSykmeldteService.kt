@@ -47,14 +47,17 @@ class DineSykmeldteService(
         return when (ansatt) {
             null -> null
             else -> {
-                val sykmeldinger = sykmeldingService.getSykmeldinger(listOf(ansatt.fnr)).filter { it.orgnummer == ansatt.orgnummer }
-                return Sykmeldt(
-                    narmestelederId = narmestelederId,
-                    orgnummer = ansatt.orgnummer,
-                    fnr = ansatt.fnr,
-                    navn = ansatt.navn,
-                    sykmeldinger = sykmeldinger.map { it.toDineSykmeldteSykmelding(ansatt) }
-                )
+                val sykmeldinger = getArbeidsgiversSykmeldinger(listOf(ansatt.fnr)).filter { it.orgnummer == ansatt.orgnummer }
+                when (sykmeldinger.isEmpty()) {
+                    true -> null
+                    else -> return Sykmeldt(
+                        narmestelederId = narmestelederId,
+                        orgnummer = ansatt.orgnummer,
+                        fnr = ansatt.fnr,
+                        navn = ansatt.navn,
+                        sykmeldinger = null
+                    )
+                }
             }
         }
     }
