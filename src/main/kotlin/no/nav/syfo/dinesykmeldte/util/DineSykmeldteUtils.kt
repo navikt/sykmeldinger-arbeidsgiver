@@ -39,8 +39,6 @@ fun ArbeidsgiverSykmelding.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
         friskmelding = Friskmelding(
             arbeidsfoerEtterPerioden = this.sykmelding.prognose?.arbeidsforEtterPeriode,
             hensynPaaArbeidsplassen = this.sykmelding.prognose?.hensynArbeidsplassen,
-            antattDatoReturSammeArbeidsgiver = this.sykmelding.prognose?.erIArbeid?.arbeidFOM,
-            antarReturSammeArbeidsgiver = this.sykmelding.prognose?.arbeidsforEtterPeriode
         )
     )
 }
