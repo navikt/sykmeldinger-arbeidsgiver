@@ -23,13 +23,13 @@ object SelftestSpek : Spek({
             application.routing { registerNaisApi(applicationState) }
 
             it("Returns ok on is_alive") {
-                with(handleRequest(HttpMethod.Get, "/is_alive")) {
+                with(handleRequest(HttpMethod.Get, "internal/is_alive")) {
                     response.status() shouldEqual HttpStatusCode.OK
                     response.content shouldEqual "I'm alive! :)"
                 }
             }
             it("Returns ok in is_ready") {
-                with(handleRequest(HttpMethod.Get, "/is_ready")) {
+                with(handleRequest(HttpMethod.Get, "internal/is_ready")) {
                     response.status() shouldEqual HttpStatusCode.OK
                     response.content shouldEqual "I'm ready! :)"
                 }
@@ -45,14 +45,14 @@ object SelftestSpek : Spek({
             application.routing { registerNaisApi(applicationState) }
 
             it("Returns internal server error when liveness check fails") {
-                with(handleRequest(HttpMethod.Get, "/is_alive")) {
+                with(handleRequest(HttpMethod.Get, "internal/is_alive")) {
                     response.status() shouldEqual HttpStatusCode.InternalServerError
                     response.content shouldEqual "I'm dead x_x"
                 }
             }
 
             it("Returns internal server error when readyness check fails") {
-                with(handleRequest(HttpMethod.Get, "/is_ready")) {
+                with(handleRequest(HttpMethod.Get, "internal/is_ready")) {
                     response.status() shouldEqual HttpStatusCode.InternalServerError
                     response.content shouldEqual "Please wait! I'm not ready :("
                 }
