@@ -20,6 +20,8 @@ val testContainerVersion = "1.15.3"
 val flywayVersion = "5.2.4"
 val hikariVersion = "3.3.0"
 val postgresVersion = "42.2.18"
+val swaggerUiVersion = "3.10.0"
+
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
 }
@@ -29,6 +31,7 @@ plugins {
     kotlin("jvm") version "1.4.21"
     id("com.diffplug.spotless") version "5.8.2"
     id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("org.hidetake.swagger.generator") version "2.18.1" apply true
     jacoco
 }
 
@@ -84,6 +87,9 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
+
+    swaggerUI( "org.webjars:swagger-ui:$swaggerUiVersion")
+
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
@@ -98,6 +104,12 @@ dependencies {
     }
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
+    }
+}
+
+swaggerSources {
+    create("sykmeldinger-arbeidsgiver").apply {
+        setInputFile(file("api/oas3/sykmeldinger-arbeidsgiver-api.yaml"))
     }
 }
 
@@ -119,6 +131,10 @@ tasks {
         kotlinOptions.jvmTarget = "12"
     }
 
+    withType<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
+        outputDir = File(buildDir.path + "/resources/main/api")
+    }
+
     withType<JacocoReport> {
         classDirectories.setFrom(
                 sourceSets.main.get().output.asFileTree.matching {
@@ -132,6 +148,7 @@ tasks {
             setPath("META-INF/cxf")
             include("bus-extensions.txt")
         }
+        dependsOn("generateSwaggerUI")
     }
 
     withType<Test> {

@@ -1,0 +1,221 @@
+openapi: 3.0.0
+
+info:
+  title: Sykmelding arbeidsgiver API
+  description: API for sykmeldinger til nærmesteleder.
+  version: 1.0.0
+servers:
+  - url: 'https://sykmeldinger-arbeidsgiver.dev.nav.no'
+paths:
+  /api/dinesykmeldte:
+    get:
+      summary: Henter narmesteleder sine sykmeldte ansatte
+      operationId: getDineSykmeldte
+      tags:
+        - DineSykmeldte
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          $ref: '#/components/responses/DineSykmeldteResponse'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+  /api/dinesykmeldte/{narmestelederId}:
+    get:
+      summary: Henter informasjon om en narmestelederkobling uten sykmeldinger
+      operationId: getNarmestelederkobling
+      tags:
+        - DineSykmeldte
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/NarmestelederId'
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sykmeldt'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not found
+components:
+  responses:
+    DineSykmeldteResponse:
+      description: "DineSykmeldte response"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DineSykmeldte'
+  parameters:
+    NarmestelederId:
+      in: query
+      name: narmestelederId
+      description: "Id på narmestelederkobling"
+  schemas:
+    DineSykmeldte:
+      type: array
+      items:
+        $ref: '#/components/schemas/SykmeldtMedSykmeldinger'
+    SykmeldtMedSykmeldinger:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Sykmeldt'
+        - $ref: '#/components/schemas/Sykmeldinger'
+    Sykmeldinger:
+      type: object
+      properties:
+        sykmeldinger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sykmelding'
+    Sykmelding:
+      type: object
+      required:
+        - sykmeldingId
+        - pasient
+        - mulighetForArbeid
+        - skalViseSkravertFelt
+        - friskmelding
+        - bekreftelse
+        - arbeidsevne
+      properties:
+        innspillTilArbeidsgiver:
+          type: string
+        arbeidsevne:
+          type: object
+          properties:
+            tilretteleggingArbeidsplass:
+              type: string
+              example: "Fortsett som sist"
+        arbeidsgiver:
+          type: string
+          example: "Pengeløs sparebank"
+        bekreftelse:
+          type: object
+          required:
+            - sykmelder
+            - utstedelsesdato
+          properties:
+            sykmelder:
+              type: string
+              example: "Fornavn Etternavn"
+              description: "Navn på den som sykmeldte personen"
+            sykmelderTlf:
+              type: string
+              description: "telefonnr til sykmelder"
+            utstedelsesdato:
+              type: string
+              format: date
+              description: "Dato sykmeldingen ble skrevet"
+        friskmelding:
+          type: object
+          properties:
+            arbeidsfoerEtterPerioden:
+              type: boolean
+            hensynPaaArbeidsplassen:
+              type: string
+              example: "Må ta det pent"
+        mulighetForArbeid:
+          type: object
+          required:
+            - aktivitetIkkeMulig434
+            - aarsakAktivitetIkkeMulig434
+            - perioder
+          properties:
+            aarsakAktivitetIkkeMulig434:
+              type: string
+              example: "andre årsaker til sykefravær"
+            aktivitetIkkeMulig434:
+              type: array
+              items:
+                type: string
+                example: "ANNET"
+            perioder:
+              type: array
+              items:
+                type: object
+                required:
+                  - fom
+                  - tom
+                  - reisetilskudd
+                properties:
+                  fom:
+                    type: string
+                    format: date
+                  tom:
+                    type: string
+                    format: date
+                  grad:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                    example: 100
+                  reisetilskudd:
+                    type: boolean
+                    example: false
+                  avventende:
+                    type: string
+        pasient:
+          type: object
+          required:
+            - fnr
+          properties:
+            fnr:
+              type: string
+              minLength: 11
+              maxLength: 11
+              example: "12345678912"
+              description: "FNR til den sykmeldte"
+            navn:
+              type: string
+              example: "Kreativ Hatt"
+              description: "Navn på den sykmeldte"
+        skalViseSkravertFelt:
+          type: boolean
+          example: true
+        stillingsprosent:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 100
+        sykmeldingId:
+          type: string
+          format: uuid
+    Sykmeldt:
+      type: object
+      properties:
+        narmestelederId:
+          type: string
+          format: uuid
+        fnr:
+          type: string
+          minLength: 11
+          maxLength: 11
+          example: "12345678912"
+          description: "FNR til den sykmeldte"
+        navn:
+          type: string
+          example: "Kreativ Hatt"
+          description: "Navn på den sykmeldte"
+        orgnummer:
+          type: string
+          minLength: 9
+          maxLength: 9
+          example: "123456789"
+          description: "Orgnummer"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
