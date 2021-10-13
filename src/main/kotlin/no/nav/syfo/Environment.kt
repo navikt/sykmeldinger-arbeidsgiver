@@ -18,7 +18,7 @@ data class Environment(
     val syfoSendtSykmeldingTopic: String = "syfo-sendt-sykmelding",
     val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
     val loginserviceIdportenAudience: List<String> = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
-    val allowedOrigin: String = getEnvVar("ALLOWED_ORIGIN"),
+    val allowedOrigin: List<String> = getEnvVar("ALLOWED_ORIGIN").split(","),
     val narmestelederUrl: String = getEnvVar("NARMESTELEDER_URL"),
 ) : KafkaConfig {
     fun jdbcUrl(): String {
