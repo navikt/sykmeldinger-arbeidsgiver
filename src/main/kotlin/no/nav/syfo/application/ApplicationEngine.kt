@@ -56,7 +56,9 @@ fun createApplicationEngine(
         install(CORS) {
             method(HttpMethod.Get)
             method(HttpMethod.Options)
-            host(if (env.cluster == "dev-gcp") { "*" } else { env.allowedOrigin }, schemes = listOf("https"))
+            env.allowedOrigin.forEach {
+                hosts.add("https://$it")
+            }
             header("nav_csrf_protection")
             allowCredentials = true
             allowNonSimpleContentTypes = true
