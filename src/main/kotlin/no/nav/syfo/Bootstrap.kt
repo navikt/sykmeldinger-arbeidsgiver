@@ -95,8 +95,8 @@ fun main() {
     val aivenKafkaConsumer = KafkaConsumer(
         KafkaUtils.getAivenKafkaConfig().also {
             it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
-            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
-        }.toConsumerConfig("narmesteleder-arbeidsforhold", JacksonKafkaDeserializer::class),
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
         StringDeserializer(),
         JacksonKafkaDeserializer(Narmesteleder::class)
     )
