@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding.kafka
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -9,6 +10,7 @@ import no.nav.syfo.log
 import no.nav.syfo.sykmelding.db.deleteSykmelding
 import no.nav.syfo.sykmelding.db.insertOrUpdateSykmelding
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
+import no.nav.syfo.util.Unbounded
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration
@@ -25,11 +27,15 @@ class SykmeldingConsumer(
     private val logTimer = 60_000L
 
     fun startConsumer() {
-        GlobalScope.launch {
-            try {
-                start()
-            } catch (ex: Exception) {
-                log.error("Error running kafka consumer", ex)
+        GlobalScope.launch(Dispatchers.Unbounded) {
+            while (applicationState.ready) {
+                try {
+                    start()
+                } catch (ex: Exception) {
+                    log.error("Error running kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
+                    kafkaConsumer.unsubscribe()
+                    delay(10_000)
+                }
             }
         }
     }
