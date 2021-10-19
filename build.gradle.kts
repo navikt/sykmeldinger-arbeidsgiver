@@ -28,7 +28,7 @@ tasks.withType<Jar> {
 
 plugins {
     id("org.jmailen.kotlinter") version "3.3.0"
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.5.30"
     id("com.diffplug.spotless") version "5.8.2"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.hidetake.swagger.generator") version "2.18.1" apply true
