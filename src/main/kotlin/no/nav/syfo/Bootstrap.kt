@@ -107,6 +107,9 @@ fun main() {
         env.narmestelederLeesahTopic,
         applicationState
     )
+
+    applicationState.ready = true
+
     narmestelederConsumer.startConsumer()
 
     SykmeldingConsumer(
@@ -116,7 +119,7 @@ fun main() {
         topic = env.syfoSendtSykmeldingTopic
     ).startConsumer()
 
-    applicationState.ready = true
+
 }
 
 fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) =
