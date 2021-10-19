@@ -51,6 +51,12 @@ spec:
     - "https://sykmeldinger-arbeidsgiver.dev.intern.nav.no"
     - "https://sykmeldinger-arbeidsgiver.dev.nav.no"
   webproxy: true
+  kafka:
+    pool: nav-dev
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
   envFrom:
     - secret: sykmeldinger-arbeidsgiver-secrets
     - configmap: loginservice-idporten
