@@ -10,6 +10,8 @@ import no.nav.syfo.narmesteleder.db.NarmestelederDB
 import no.nav.syfo.narmesteleder.kafka.model.Narmesteleder
 import no.nav.syfo.util.Unbounded
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.Duration
 
 class NarmestelederConsumer(
@@ -18,6 +20,9 @@ class NarmestelederConsumer(
     private val narmestelederTopic: String,
     private val applicationState: ApplicationState
 ) {
+    companion object {
+        private val log = LoggerFactory.getLogger(NarmestelederConsumer::class.java)
+    }
 
     fun startConsumer() {
         GlobalScope.launch(Dispatchers.Unbounded) {
