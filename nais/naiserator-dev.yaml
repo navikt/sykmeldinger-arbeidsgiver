@@ -8,8 +8,6 @@ metadata:
 spec:
   accessPolicy:
     outbound:
-      external:
-        - host: https://pdl-api.dev-fss-pub.nais.io
       rules:
         - application: narmesteleder
   gcp:

@@ -8,8 +8,6 @@ metadata:
 spec:
   accessPolicy:
     outbound:
-      external:
-        - host: https://pdl-api.prod-fss-pub.nais.io
       rules:
         - application: narmesteleder
   image: {{ image }}
