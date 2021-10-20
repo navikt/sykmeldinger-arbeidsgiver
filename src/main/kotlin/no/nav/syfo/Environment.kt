@@ -16,11 +16,17 @@ data class Environment(
     override val truststore: String? = getEnvVar("NAV_TRUSTSTORE_PATH"),
     override val truststorePassword: String? = getEnvVar("NAV_TRUSTSTORE_PASSWORD"),
     val syfoSendtSykmeldingTopic: String = "syfo-sendt-sykmelding",
+    val syfoSendtSykmeldingTopicAiven: String = "teamsykmelding.syfo-sendt-sykmelding",
     val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
     val loginserviceIdportenAudience: List<String> = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
     val allowedOrigin: List<String> = getEnvVar("ALLOWED_ORIGIN").split(","),
     val narmestelederUrl: String = getEnvVar("NARMESTELEDER_URL"),
-    val narmestelederLeesahTopic: String = "teamsykmelding.syfo-narmesteleder-leesah"
+    val narmestelederLeesahTopic: String = "teamsykmelding.syfo-narmesteleder-leesah",
+    val pdlScope: String = getEnvVar("PDL_SCOPE"),
+    val pdlGraphqlPath: String = getEnvVar("PDL_GRAPHQL_PATH"),
+    val aadAccessTokenUrl: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
+    val clientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
+    val clientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET")
 ) : KafkaConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$dbHost:$dbPort/$dbName"

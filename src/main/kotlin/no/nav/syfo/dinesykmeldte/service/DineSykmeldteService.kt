@@ -4,7 +4,7 @@ import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.dinesykmeldte.util.toDineSykmeldteSykmelding
 import no.nav.syfo.narmesteleder.client.NarmestelederClient
 import no.nav.syfo.sykmelding.SykmeldingService
-import no.nav.syfo.sykmelding.model.ArbeidsgiverSykmelding
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import java.time.LocalDate
 
 data class ArbeidsgiverKey(
@@ -34,12 +34,12 @@ class DineSykmeldteService(
         }.filterNotNull()
     }
 
-    private fun getArbeidsgiversSykmeldinger(fnr: List<String>): List<ArbeidsgiverSykmelding> {
+    private fun getArbeidsgiversSykmeldinger(fnr: List<String>): List<SykmeldingArbeidsgiver> {
         return sykmeldingService.getSykmeldinger(fnr)
             .filter { filterOutOldSykmeldinger(it) }
     }
 
-    private fun filterOutOldSykmeldinger(it: ArbeidsgiverSykmelding) =
+    private fun filterOutOldSykmeldinger(it: SykmeldingArbeidsgiver) =
         it.sykmelding.sykmeldingsperioder.maxOf { periode -> periode.tom } >= LocalDate.now().minusMonths(4)
 
     suspend fun getSykmeldt(narmestelederId: String, bearerToken: String): Sykmeldt? {

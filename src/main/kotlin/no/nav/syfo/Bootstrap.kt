@@ -19,6 +19,7 @@ import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.application.database.Database
+import no.nav.syfo.azuread.AccessTokenClient
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.loadBaseConfig
@@ -27,9 +28,13 @@ import no.nav.syfo.narmesteleder.client.NarmestelederClient
 import no.nav.syfo.narmesteleder.db.NarmestelederDB
 import no.nav.syfo.narmesteleder.kafka.NarmestelederConsumer
 import no.nav.syfo.narmesteleder.kafka.model.Narmesteleder
+import no.nav.syfo.pdl.client.PdlClient
+import no.nav.syfo.pdl.service.PdlPersonService
+import no.nav.syfo.sykmelding.SykmeldingAivenService
 import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.kafka.SykmeldingConsumer
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
+import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
 import no.nav.syfo.sykmelding.kafka.util.JacksonKafkaDeserializer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -119,6 +124,26 @@ fun main() {
         topic = env.syfoSendtSykmeldingTopic
     ).startConsumer()
 
+    val accessTokenClient = AccessTokenClient(env.aadAccessTokenUrl, env.clientId, env.clientSecret, httpClient)
+    val pdlClient = PdlClient(
+        httpClient,
+        env.pdlGraphqlPath,
+        PdlClient::class.java.getResource("/graphql/getPerson.graphql").readText().replace(Regex("[\n\t]"), "")
+    )
+    val pdlPersonService = PdlPersonService(pdlClient, accessTokenClient, env.pdlScope)
+
+    val aivenKafkaSykmeldingConsumer = KafkaConsumer(
+        KafkaUtils.getAivenKafkaConfig().also {
+            it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
+        StringDeserializer(),
+        JacksonKafkaDeserializer(SykmeldingArbeidsgiverKafkaMessage::class)
+    )
+
+    val sykmeldingAivenService = SykmeldingAivenService(
+        aivenKafkaSykmeldingConsumer, database, applicationState, env.syfoSendtSykmeldingTopicAiven, pdlPersonService
+    ).startConsumer()
 
 }
 

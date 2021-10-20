@@ -1,0 +1,88 @@
+package no.nav.syfo.sykmelding
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.pdl.service.PdlPersonService
+import no.nav.syfo.sykmelding.db.deleteSykmelding
+import no.nav.syfo.sykmelding.db.insertOrUpdateSykmeldingArbeidsgiver
+import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
+import no.nav.syfo.util.Unbounded
+import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.slf4j.LoggerFactory
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+
+class SykmeldingAivenService(
+    private val kafkaConsumer: KafkaConsumer<String, SykmeldingArbeidsgiverKafkaMessage?>,
+    private val database: DatabaseInterface,
+    private val applicationState: ApplicationState,
+    private val topic: String,
+    private val pdlPersonService: PdlPersonService
+) {
+    companion object {
+        private val log = LoggerFactory.getLogger(SykmeldingAivenService::class.java)
+    }
+
+    private var lastLogTime = Instant.now().toEpochMilli()
+    private val logTimer = 60_000L
+    private var ignoredSykmeldinger = 0
+    fun startConsumer() {
+        GlobalScope.launch(Dispatchers.Unbounded) {
+            while (applicationState.ready) {
+                try {
+                    kafkaConsumer.subscribe(listOf(topic))
+                    start()
+                } catch (ex: Exception) {
+                    log.error("Error running kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
+                    kafkaConsumer.unsubscribe()
+                    delay(10_000)
+                }
+            }
+        }
+    }
+
+    suspend fun start() {
+        var processedMessages = 0
+        while (applicationState.ready) {
+            val sykmeldinger = kafkaConsumer.poll(Duration.ZERO)
+            sykmeldinger.forEach {
+                handleSykmelding(it.key(), it.value())
+            }
+            processedMessages += sykmeldinger.count()
+            processedMessages = logProcessedMessages(processedMessages)
+            delay(1)
+        }
+    }
+
+    private fun logProcessedMessages(processedMessages: Int): Int {
+        var currentLogTime = Instant.now().toEpochMilli()
+        if (processedMessages > 0 && currentLogTime - lastLogTime > logTimer) {
+            log.info("Processed $processedMessages messages, ignored sykmeldinger $ignoredSykmeldinger")
+            lastLogTime = currentLogTime
+            return 0
+        }
+        return processedMessages
+    }
+
+    private suspend fun handleSykmelding(sykmeldingId: String, sykmeldingArbeidsgiverKafkaMessage: SykmeldingArbeidsgiverKafkaMessage?) {
+        if (sykmeldingArbeidsgiverKafkaMessage == null) {
+            database.deleteSykmelding(sykmeldingId)
+        } else {
+            val latestTom = sykmeldingArbeidsgiverKafkaMessage.sykmelding.sykmeldingsperioder.maxOf { it.tom }
+            if(skalIgnorereSykmelding(latestTom)) {
+                ignoredSykmeldinger += 1
+            } else {
+                val person = pdlPersonService.getPerson(fnr = sykmeldingArbeidsgiverKafkaMessage.kafkaMetadata.fnr, callId = sykmeldingId)
+                database.insertOrUpdateSykmeldingArbeidsgiver(sykmeldingArbeidsgiverKafkaMessage, person,latestTom)
+            }
+        }
+    }
+
+    private fun skalIgnorereSykmelding(latestTom: LocalDate) =
+        latestTom.isBefore(LocalDate.now().minusMonths(4))
+}
