@@ -1,7 +1,6 @@
 package no.nav.syfo.sykmelding
 
 import io.mockk.clearMocks
-import io.mockk.clearStaticMockk
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -9,7 +8,6 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.database.Database
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.pdl.model.Navn
 import no.nav.syfo.pdl.model.PdlPerson
@@ -33,7 +31,7 @@ class SykmeldingAivenServiceTest : Spek({
     val applicationState = mockk<ApplicationState>()
     val pdlService = mockk<PdlPersonService>()
 
-    val sykmeldingConsumer = SykmeldingAivenService(kafkaConsumer, database, applicationState, topic, pdlService)
+    val sykmeldingConsumer = SykmeldingAivenService(kafkaConsumer, database, applicationState, topic, pdlService, "test")
     mockkStatic("no.nav.syfo.sykmelding.db.SykmeldingDbKt")
     afterEachTest {
         clearMocks(database, kafkaConsumer, pdlService, applicationState)
@@ -51,7 +49,8 @@ class SykmeldingAivenServiceTest : Spek({
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(
                         ConsumerRecord(
-                            "topic", 1, 1, "String", getSykmeldingArbeidsgiverKafkaMessage(
+                            "topic", 1, 1, "String",
+                            getSykmeldingArbeidsgiverKafkaMessage(
                                 LocalDate.now().minusMonths(5),
                                 LocalDate.now().minusMonths(4)
                             )
@@ -71,7 +70,8 @@ class SykmeldingAivenServiceTest : Spek({
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(
                         ConsumerRecord(
-                            "topic", 1, 1, "String", getSykmeldingArbeidsgiverKafkaMessage(
+                            "topic", 1, 1, "String",
+                            getSykmeldingArbeidsgiverKafkaMessage(
                                 fom = LocalDate.now().minusMonths(5),
                                 tom = LocalDate.now().minusMonths(4).minusDays(1)
                             )
@@ -87,5 +87,4 @@ class SykmeldingAivenServiceTest : Spek({
             verify(exactly = 0) { database.insertOrUpdateSykmeldingArbeidsgiver(any(), any(), any()) }
         }
     }
-
 })

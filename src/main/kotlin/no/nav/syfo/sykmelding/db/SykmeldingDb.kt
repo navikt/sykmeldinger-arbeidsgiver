@@ -20,7 +20,6 @@ private fun toPGObject(obj: Any) = PGobject().also {
     it.value = objectMapper.writeValueAsString(obj)
 }
 
-
 private fun insertOrUpdateSykmeldt(
     connection: Connection,
     latestTom: LocalDate,
@@ -38,17 +37,16 @@ private fun insertOrUpdateSykmeldt(
     ).use { ps ->
         var index = 1
         var latestDate = Date.valueOf(latestTom)
-        //insert
+        // insert
         ps.setString(index++, fnr)
         ps.setString(index++, navn)
         ps.setDate(index++, latestDate)
-        //update
+        // update
         ps.setString(index++, navn)
         ps.setDate(index, latestDate)
         ps.execute()
     }
 }
-
 
 fun DatabaseInterface.insertOrUpdateSykmeldingArbeidsgiver(sendtSykmeldingKafkaMessage: SykmeldingArbeidsgiverKafkaMessage, person: PdlPerson, latestTom: LocalDate) {
     connection.use {

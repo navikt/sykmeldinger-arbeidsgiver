@@ -8,7 +8,6 @@ import no.nav.syfo.pdl.client.model.GetPersonRequest
 import no.nav.syfo.pdl.client.model.GetPersonResponse
 import no.nav.syfo.pdl.client.model.GetPersonVariables
 
-
 class PdlClient(
     private val httpClient: HttpClient,
     private val basePath: String,

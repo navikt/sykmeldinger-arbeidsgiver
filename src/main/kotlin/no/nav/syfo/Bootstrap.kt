@@ -142,9 +142,8 @@ fun main() {
     )
 
     val sykmeldingAivenService = SykmeldingAivenService(
-        aivenKafkaSykmeldingConsumer, database, applicationState, env.syfoSendtSykmeldingTopicAiven, pdlPersonService
+        aivenKafkaSykmeldingConsumer, database, applicationState, env.syfoSendtSykmeldingTopicAiven, pdlPersonService, env.cluster
     ).startConsumer()
-
 }
 
 fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) =

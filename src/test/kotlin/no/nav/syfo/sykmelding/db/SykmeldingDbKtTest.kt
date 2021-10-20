@@ -126,8 +126,7 @@ class SykmeldingDbKtTest : Spek({
             val newSykmelding = arbeidsgiverSykmelding.copy(sykmelding = arbeidsgiverSykmelding.sykmelding.copy(id = "1234", sykmeldingsperioder = arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.map { it.copy(fom = LocalDate.now().plusDays(10), tom = LocalDate.now().plusDays(20)) }))
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
-            database.insertOrUpdateSykmeldingArbeidsgiver(newSykmelding,  person.copy(Navn("Test", null, "Tester")), newSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
-
+            database.insertOrUpdateSykmeldingArbeidsgiver(newSykmelding, person.copy(Navn("Test", null, "Tester")), newSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
 
             val saved = database.getArbeidsgiverSykmeldinger(listOf("12345678901"))
             saved.filter { it.sykmelding == newSykmelding.sykmelding }.size shouldBeEqualTo 1
@@ -142,7 +141,6 @@ class SykmeldingDbKtTest : Spek({
     }
 })
 
-
 private fun DatabaseInterface.getArbeidsgiverSykmeldinger(fnrs: List<String>): List<SykmeldingArbeidsgiverV2> {
     return connection.use { connection ->
         connection.prepareStatement("""SELECT * FROM sykmelding_arbeidsgiver as sa inner join sykmeldt as s on sa.pasient_fnr = s.pasient_fnr where sa.pasient_fnr = ANY (?)""")
@@ -153,7 +151,7 @@ private fun DatabaseInterface.getArbeidsgiverSykmeldinger(fnrs: List<String>): L
     }
 }
 
-fun ResultSet.toSykmeldingArbeidsgiverV2() : SykmeldingArbeidsgiverV2 {
+fun ResultSet.toSykmeldingArbeidsgiverV2(): SykmeldingArbeidsgiverV2 {
     return SykmeldingArbeidsgiverV2(
         pasientFnr = getString("pasient_fnr"),
         orgnummer = getString("orgnummer"),
@@ -161,9 +159,7 @@ fun ResultSet.toSykmeldingArbeidsgiverV2() : SykmeldingArbeidsgiverV2 {
         sykmelding = objectMapper.readValue(getString("sykmelding")),
         navn = getString("pasient_navn")
     )
-
 }
-
 
 fun getSykmeldingArbeidsgiverKafkaMessage(fom: LocalDate, tom: LocalDate): SykmeldingArbeidsgiverKafkaMessage {
     return SykmeldingArbeidsgiverKafkaMessage(
@@ -181,7 +177,7 @@ fun getSykmeldingArbeidsgiverKafkaMessage(fom: LocalDate, tom: LocalDate): Sykme
         kafkaMetadata = KafkaMetadataDTO(
             "213", OffsetDateTime.now(ZoneOffset.UTC), fnr = "12345678901", source = "user"
         ),
-        sykmelding = getArbeidsgiverSykmelding(fom = fom ,tom = tom)
+        sykmelding = getArbeidsgiverSykmelding(fom = fom, tom = tom)
     )
 }
 

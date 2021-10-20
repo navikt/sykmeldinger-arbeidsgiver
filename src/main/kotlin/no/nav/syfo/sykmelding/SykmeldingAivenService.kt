@@ -6,6 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.pdl.exceptions.NameNotFoundInPdlException
 import no.nav.syfo.pdl.service.PdlPersonService
 import no.nav.syfo.sykmelding.db.deleteSykmelding
 import no.nav.syfo.sykmelding.db.insertOrUpdateSykmeldingArbeidsgiver
@@ -22,7 +23,8 @@ class SykmeldingAivenService(
     private val database: DatabaseInterface,
     private val applicationState: ApplicationState,
     private val topic: String,
-    private val pdlPersonService: PdlPersonService
+    private val pdlPersonService: PdlPersonService,
+    private val cluster: String
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(SykmeldingAivenService::class.java)
@@ -74,11 +76,19 @@ class SykmeldingAivenService(
             database.deleteSykmelding(sykmeldingId)
         } else {
             val latestTom = sykmeldingArbeidsgiverKafkaMessage.sykmelding.sykmeldingsperioder.maxOf { it.tom }
-            if(skalIgnorereSykmelding(latestTom)) {
+            if (skalIgnorereSykmelding(latestTom)) {
                 ignoredSykmeldinger += 1
             } else {
-                val person = pdlPersonService.getPerson(fnr = sykmeldingArbeidsgiverKafkaMessage.kafkaMetadata.fnr, callId = sykmeldingId)
-                database.insertOrUpdateSykmeldingArbeidsgiver(sykmeldingArbeidsgiverKafkaMessage, person,latestTom)
+                try {
+                    val person = pdlPersonService.getPerson(fnr = sykmeldingArbeidsgiverKafkaMessage.kafkaMetadata.fnr, callId = sykmeldingId)
+                    database.insertOrUpdateSykmeldingArbeidsgiver(sykmeldingArbeidsgiverKafkaMessage, person, latestTom)
+                } catch (ex: NameNotFoundInPdlException) {
+                    if (cluster != "dev-gcp") {
+                        throw ex
+                    } else {
+                        log.info("Ignoring sykmelding when person is not found in pdl for sykmelding: $sykmeldingId")
+                    }
+                }
             }
         }
     }
