@@ -20,9 +20,13 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.application.database.Database
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
+import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.loadBaseConfig
 import no.nav.syfo.kafka.toConsumerConfig
 import no.nav.syfo.narmesteleder.client.NarmestelederClient
+import no.nav.syfo.narmesteleder.db.NarmestelederDB
+import no.nav.syfo.narmesteleder.kafka.NarmestelederConsumer
+import no.nav.syfo.narmesteleder.kafka.model.Narmesteleder
 import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.kafka.SykmeldingConsumer
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
@@ -88,6 +92,26 @@ fun main() {
     val kafkaConsumer =
         KafkaConsumer(properties, StringDeserializer(), JacksonKafkaDeserializer(SendtSykmeldingKafkaMessage::class))
 
+    val aivenKafkaConsumer = KafkaConsumer(
+        KafkaUtils.getAivenKafkaConfig().also {
+            it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
+        StringDeserializer(),
+        JacksonKafkaDeserializer(Narmesteleder::class)
+    )
+    val narmestelederDB = NarmestelederDB(database)
+    val narmestelederConsumer = NarmestelederConsumer(
+        narmestelederDB,
+        aivenKafkaConsumer,
+        env.narmestelederLeesahTopic,
+        applicationState
+    )
+
+    applicationState.ready = true
+
+    narmestelederConsumer.startConsumer()
+
     SykmeldingConsumer(
         kafkaConsumer = kafkaConsumer,
         database = database,
@@ -95,7 +119,7 @@ fun main() {
         topic = env.syfoSendtSykmeldingTopic
     ).startConsumer()
 
-    applicationState.ready = true
+
 }
 
 fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) =

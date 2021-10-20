@@ -20,6 +20,7 @@ data class Environment(
     val loginserviceIdportenAudience: List<String> = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
     val allowedOrigin: List<String> = getEnvVar("ALLOWED_ORIGIN").split(","),
     val narmestelederUrl: String = getEnvVar("NARMESTELEDER_URL"),
+    val narmestelederLeesahTopic: String = "teamsykmelding.syfo-narmesteleder-leesah"
 ) : KafkaConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$dbHost:$dbPort/$dbName"

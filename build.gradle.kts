@@ -13,7 +13,7 @@ val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "6.5"
 val prometheusVersion = "0.9.0"
 val spekVersion = "2.0.9"
-val smCommonVersion = "1.836b169"
+val smCommonVersion = "1.4b9d191"
 val mockkVersion = "1.10.3"
 val nimbusdsVersion = "9.2"
 val testContainerVersion = "1.15.3"
@@ -28,7 +28,7 @@ tasks.withType<Jar> {
 
 plugins {
     id("org.jmailen.kotlinter") version "3.3.0"
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.5.30"
     id("com.diffplug.spotless") version "5.8.2"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("org.hidetake.swagger.generator") version "2.18.1" apply true
