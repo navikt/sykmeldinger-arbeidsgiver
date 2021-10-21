@@ -7,7 +7,6 @@ data class DineSykmeldteSykmelding(
     val skalViseSkravertFelt: Boolean = true,
     val friskmelding: Friskmelding,
     val arbeidsgiver: String?,
-    val stillingsprosent: Int?,
     val bekreftelse: Bekreftelse,
     val arbeidsevne: Arbeidsevne,
     val innspillTilArbeidsgiver: String?

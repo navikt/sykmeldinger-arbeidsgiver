@@ -7,12 +7,12 @@ import no.nav.syfo.dinesykmeldte.model.Friskmelding
 import no.nav.syfo.dinesykmeldte.model.MulighetForArbeid
 import no.nav.syfo.dinesykmeldte.model.Pasient
 import no.nav.syfo.dinesykmeldte.model.Periode
-import no.nav.syfo.model.sykmelding.model.BehandlerDTO
-import no.nav.syfo.model.sykmelding.model.SykmeldingsperiodeDTO
-import no.nav.syfo.narmesteleder.client.model.Ansatt
-import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
+import no.nav.syfo.model.sykmelding.arbeidsgiver.BehandlerAGDTO
+import no.nav.syfo.model.sykmelding.arbeidsgiver.SykmeldingsperiodeAGDTO
+import no.nav.syfo.narmesteleder.model.Ansatt
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
 
-fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
+fun SykmeldingArbeidsgiverV2.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
     return DineSykmeldteSykmelding(
         pasient = Pasient(
             fnr = pasientFnr,
@@ -26,7 +26,6 @@ fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
         ),
         skalViseSkravertFelt = true,
         arbeidsgiver = this.orgNavn,
-        stillingsprosent = this.sykmelding.arbeidsgiver.stillingsprosent,
         innspillTilArbeidsgiver = this.sykmelding.meldingTilArbeidsgiver,
         arbeidsevne = Arbeidsevne(
             tilretteleggingArbeidsplass = this.sykmelding.tiltakArbeidsplassen
@@ -43,7 +42,7 @@ fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
     )
 }
 
-fun getSykmelderNavn(behandlerDTO: BehandlerDTO): String {
+fun getSykmelderNavn(behandlerDTO: BehandlerAGDTO): String {
     return if (behandlerDTO.mellomnavn.isNullOrEmpty()) {
         capitalizeFirstLetter("${behandlerDTO.fornavn} ${behandlerDTO.etternavn}")
     } else {
@@ -57,19 +56,19 @@ private fun capitalizeFirstLetter(string: String): String {
         .split("-").joinToString("-") { it.capitalize() }.trimEnd()
 }
 
-fun getAktivitetIkkeMuligBeskrivelse(sykmeldingsperioder: List<SykmeldingsperiodeDTO>): String {
+fun getAktivitetIkkeMuligBeskrivelse(sykmeldingsperioder: List<SykmeldingsperiodeAGDTO>): String {
     return sykmeldingsperioder.mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak?.beskrivelse }.distinct().joinToString(separator = ", ")
 }
 
-fun getAktivitetIkkeMulig(sykmeldingsperioder: List<SykmeldingsperiodeDTO>): List<String> {
+fun getAktivitetIkkeMulig(sykmeldingsperioder: List<SykmeldingsperiodeAGDTO>): List<String> {
     return sykmeldingsperioder.mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak }.flatMap { it.arsak }.map { it.name }.distinct()
 }
 
-private fun SykmeldingArbeidsgiver.getPerioder(): List<Periode> {
+private fun SykmeldingArbeidsgiverV2.getPerioder(): List<Periode> {
     return sykmelding.sykmeldingsperioder.map { it.toPerioder() }
 }
 
-private fun SykmeldingsperiodeDTO.toPerioder(): Periode {
+private fun SykmeldingsperiodeAGDTO.toPerioder(): Periode {
     return Periode(
         fom = this.fom,
         tom = this.tom,
