@@ -10,9 +10,9 @@ import no.nav.syfo.dinesykmeldte.model.Periode
 import no.nav.syfo.model.sykmelding.model.BehandlerDTO
 import no.nav.syfo.model.sykmelding.model.SykmeldingsperiodeDTO
 import no.nav.syfo.narmesteleder.client.model.Ansatt
-import no.nav.syfo.sykmelding.model.ArbeidsgiverSykmelding
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 
-fun ArbeidsgiverSykmelding.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
+fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
     return DineSykmeldteSykmelding(
         pasient = Pasient(
             fnr = pasientFnr,
@@ -65,7 +65,7 @@ fun getAktivitetIkkeMulig(sykmeldingsperioder: List<SykmeldingsperiodeDTO>): Lis
     return sykmeldingsperioder.mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak }.flatMap { it.arsak }.map { it.name }.distinct()
 }
 
-private fun ArbeidsgiverSykmelding.getPerioder(): List<Periode> {
+private fun SykmeldingArbeidsgiver.getPerioder(): List<Periode> {
     return sykmelding.sykmeldingsperioder.map { it.toPerioder() }
 }
 

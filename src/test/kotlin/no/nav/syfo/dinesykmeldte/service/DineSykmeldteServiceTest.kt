@@ -7,7 +7,7 @@ import no.nav.syfo.narmesteleder.client.NarmestelederClient
 import no.nav.syfo.narmesteleder.client.model.Ansatt
 import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.db.enkelSykmelding
-import no.nav.syfo.sykmelding.model.ArbeidsgiverSykmelding
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBe
@@ -44,7 +44,7 @@ class DineSykmeldteServiceTest : Spek({
 
         it("Get sykmeldinger for ansatt") {
             coEvery { narmestelederClient.getAnsatte("token") } returns listOf(Ansatt("1", "navn", "2", UUID.randomUUID()))
-            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "2", "3", "navn", enkelSykmelding()))
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(SykmeldingArbeidsgiver("1", "2", "3", "navn", enkelSykmelding()))
 
             runBlocking {
                 val sykmeldinger = dineSykmeldteService.getDineSykmeldte("token")
@@ -54,7 +54,7 @@ class DineSykmeldteServiceTest : Spek({
 
         it("Should filter out sykmeldinger on different orgnr") {
             coEvery { narmestelederClient.getAnsatte("token") } returns listOf(Ansatt("1", "navn", "2", UUID.randomUUID()))
-            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", "navn", enkelSykmelding()))
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(SykmeldingArbeidsgiver("1", "3", "3", "navn", enkelSykmelding()))
 
             runBlocking {
                 val sykmeldinger = dineSykmeldteService.getDineSykmeldte("token")
@@ -67,8 +67,8 @@ class DineSykmeldteServiceTest : Spek({
                 Ansatt("2", "navn", "2", UUID.randomUUID())
             )
             coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(
-                ArbeidsgiverSykmelding("1", "2", "3", "navn", enkelSykmelding()),
-                ArbeidsgiverSykmelding("2", "2", "4", "navn", enkelSykmelding())
+                SykmeldingArbeidsgiver("1", "2", "3", "navn", enkelSykmelding()),
+                SykmeldingArbeidsgiver("2", "2", "4", "navn", enkelSykmelding())
             )
 
             runBlocking {
@@ -79,7 +79,7 @@ class DineSykmeldteServiceTest : Spek({
         it("Should get one ansatt") {
             val nlId = UUID.randomUUID()
             coEvery { narmestelederClient.getAnsatt(nlId.toString(), "token") } returns Ansatt("1", "navn", "3", nlId)
-            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", "navn", enkelSykmelding()))
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(SykmeldingArbeidsgiver("1", "3", "3", "navn", enkelSykmelding()))
             runBlocking {
                 val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
                 sykmeldt shouldNotBe null
@@ -90,7 +90,7 @@ class DineSykmeldteServiceTest : Spek({
         it("Should get one ansatt, filter out other sykmeldinger") {
             val nlId = UUID.randomUUID()
             coEvery { narmestelederClient.getAnsatt(nlId.toString(), "token") } returns Ansatt("1", "navn", "2", nlId)
-            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(ArbeidsgiverSykmelding("1", "3", "3", "navn", enkelSykmelding()))
+            coEvery { sykmeldingService.getSykmeldinger(any()) } returns listOf(SykmeldingArbeidsgiver("1", "3", "3", "navn", enkelSykmelding()))
             runBlocking {
                 val sykmeldt = dineSykmeldteService.getSykmeldt(nlId.toString(), "token")
                 sykmeldt shouldBe null

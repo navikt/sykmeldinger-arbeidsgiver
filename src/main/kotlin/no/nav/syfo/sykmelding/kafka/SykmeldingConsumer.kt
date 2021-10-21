@@ -6,8 +6,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.log
-import no.nav.syfo.narmesteleder.kafka.NarmestelederConsumer
 import no.nav.syfo.sykmelding.db.deleteSykmelding
 import no.nav.syfo.sykmelding.db.insertOrUpdateSykmelding
 import no.nav.syfo.sykmelding.kafka.model.SendtSykmeldingKafkaMessage
