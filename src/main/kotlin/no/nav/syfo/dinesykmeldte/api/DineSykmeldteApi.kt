@@ -8,12 +8,15 @@ import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
+import no.nav.syfo.log
 
 fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
     get("api/dinesykmeldte") {
         val principal: JWTPrincipal = call.authentication.principal()!!
         val fnr = principal.payload.subject
-        call.respond(dineSykmeldteService.getDineSykmeldte(fnr))
+        val sykmeldte = dineSykmeldteService.getDineSykmeldte(fnr)
+        log.info("Hentet ${sykmeldte.size} fra db")
+        call.respond(sykmeldte)
     }
 
     get("api/dinesykmeldte/{narmestelederId}") {
