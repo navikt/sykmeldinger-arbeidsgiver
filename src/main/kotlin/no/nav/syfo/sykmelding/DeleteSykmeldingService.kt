@@ -24,7 +24,7 @@ class DeleteSykmeldingService(val database: DatabaseInterface, val applicationSt
                 } catch (ex: Exception) {
                     log.error("Could not delte sykmeldinger/sykmeldt")
                 }
-                delay(Duration.hours(1))
+                delay(60_000.times(60))
             }
         }
     }
