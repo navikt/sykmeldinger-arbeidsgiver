@@ -7,6 +7,7 @@ import no.nav.syfo.dinesykmeldte.model.Friskmelding
 import no.nav.syfo.dinesykmeldte.model.MulighetForArbeid
 import no.nav.syfo.dinesykmeldte.model.Pasient
 import no.nav.syfo.dinesykmeldte.model.Periode
+import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.model.sykmelding.arbeidsgiver.BehandlerAGDTO
 import no.nav.syfo.model.sykmelding.arbeidsgiver.SykmeldingsperiodeAGDTO
 import no.nav.syfo.narmesteleder.model.Ansatt
@@ -76,5 +77,15 @@ private fun SykmeldingsperiodeAGDTO.toPerioder(): Periode {
         behandlingsdager = this.behandlingsdager,
         reisetilskudd = this.reisetilskudd,
         avventende = this.innspillTilArbeidsgiver,
+    )
+}
+
+fun Ansatt.toSykmeldt(): Sykmeldt {
+    return Sykmeldt(
+        narmestelederId = this.narmestelederId,
+        orgnummer = this.orgnummer,
+        fnr = this.fnr,
+        navn = this.navn,
+        sykmeldinger = null
     )
 }

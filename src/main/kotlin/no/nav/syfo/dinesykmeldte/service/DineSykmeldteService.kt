@@ -2,22 +2,20 @@ package no.nav.syfo.dinesykmeldte.service
 
 import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.dinesykmeldte.util.toDineSykmeldteSykmelding
+import no.nav.syfo.dinesykmeldte.util.toSykmeldt
 import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.sykmelding.SykmeldingService
+import java.time.LocalDate
 
 class DineSykmeldteService(
     private val sykmeldingService: SykmeldingService
 ) {
     fun getSykmeldt(narmestelederId: String, fnr: String): Sykmeldt? {
-        return sykmeldingService.getSykmeldt(narmestelederId, fnr)?.let {
-            Sykmeldt(
-                narmestelederId = it.narmestelederId,
-                orgnummer = it.orgnummer,
-                fnr = it.fnr,
-                navn = it.navn,
-                sykmeldinger = null
-            )
-        }
+        return sykmeldingService.getSykmeldt(narmestelederId, fnr)?.toSykmeldt()
+    }
+
+    fun getSykmeldt(narmestelederId: String, fnr: String, date: LocalDate): Sykmeldt? {
+        return sykmeldingService.getSykmeldt(narmestelederId, fnr, date)?.toSykmeldt()
     }
 
     fun getDineSykmeldte(fnrLeder: String): List<Sykmeldt> {

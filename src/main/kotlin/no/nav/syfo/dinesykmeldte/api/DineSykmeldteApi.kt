@@ -9,6 +9,8 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
     get("api/dinesykmeldte") {
@@ -24,6 +26,19 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
         val principal: JWTPrincipal = call.authentication.principal()!!
         val fnr = principal.payload.subject
         when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, fnr)) {
+            null -> call.respond(HttpStatusCode.NotFound)
+            else -> {
+                call.respond(sykmeldt)
+            }
+        }
+    }
+
+    get("api/dinesykmeldte/{narmestelederId}/{date}") {
+        val narmestelederId = call.parameters["narmestelederId"]!!
+        val date = LocalDate.parse(call.parameters["date"]!!, DateTimeFormatter.ISO_DATE)
+        val principal: JWTPrincipal = call.authentication.principal()!!
+        val fnr = principal.payload.subject
+        when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, fnr, date)) {
             null -> call.respond(HttpStatusCode.NotFound)
             else -> {
                 call.respond(sykmeldt)

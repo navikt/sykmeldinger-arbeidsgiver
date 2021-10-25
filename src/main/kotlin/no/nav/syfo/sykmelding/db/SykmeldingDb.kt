@@ -174,6 +174,23 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<Sykmel
     }
 }
 
+fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelederId: String): List<SykmeldingArbeidsgiverV2> {
+    return connection.use { connection ->
+        connection.prepareStatement(
+            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
+                    inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
+                    inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
+                    where nl.leder_fnr = ?
+                       and nl.narmeste_leder_id = ?;
+                """
+        ).use { ps ->
+            ps.setString(1, lederFnr)
+            ps.setString(2, narmestelederId)
+            ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
+        }
+    }
+}
+
 fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiverV2 {
     return SykmeldingArbeidsgiverV2(
         narmestelederId = getString("narmeste_leder_id"),
