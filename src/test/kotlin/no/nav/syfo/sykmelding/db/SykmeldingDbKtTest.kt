@@ -90,6 +90,30 @@ class SykmeldingDbKtTest : Spek({
             savedSykmelding.sykmelding shouldBeEqualTo arbeidsgiverSykmelding.sykmelding
         }
 
+        it("test should delete") {
+            val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
+                fom = LocalDate.of(2021, 1, 1),
+                tom = LocalDate.of(2021, 2, 1)
+            )
+            val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
+            database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
+            val updated = database.deleteSykmeldinger(LocalDate.of(2021, 2, 2))
+            updated.deletedSykmeldt shouldBeEqualTo 1
+            updated.deletedSykmelding shouldBeEqualTo 1
+        }
+
+        it("test should not delete") {
+            val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
+                fom = LocalDate.of(2021, 1, 1),
+                tom = LocalDate.of(2021, 2, 1)
+            )
+            val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
+            database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
+            val updated = database.deleteSykmeldinger(LocalDate.of(2021, 2, 1))
+            updated.deletedSykmeldt shouldBeEqualTo 0
+            updated.deletedSykmelding shouldBeEqualTo 0
+        }
+
         it("Save ArbeidsgiverSykmelding with updated name and tom") {
 
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
