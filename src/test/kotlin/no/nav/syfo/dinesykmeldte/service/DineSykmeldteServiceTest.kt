@@ -17,7 +17,7 @@ class DineSykmeldteServiceTest : Spek({
 
     describe("Get sykmeldinger") {
         it("Should get SykmeldingerArbeidsgiverV2") {
-            every { sykmeldingService.getSykmeldinger("123") } returns listOf(SykmeldingArbeidsgiverV2("lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn", getArbeidsgiverSykmelding()))
+            every { sykmeldingService.getSykmeldinger("123") } returns listOf(SykmeldingArbeidsgiverV2("lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn", getArbeidsgiverSykmelding(sykmeldingsId = "123")))
             runBlocking {
                 val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
                 sykmeldte.size shouldBeEqualTo 1

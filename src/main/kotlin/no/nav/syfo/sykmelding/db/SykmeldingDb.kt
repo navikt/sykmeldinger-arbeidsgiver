@@ -176,6 +176,23 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<Sykmel
     }
 }
 
+fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelederId: String): List<SykmeldingArbeidsgiverV2> {
+    return connection.use { connection ->
+        connection.prepareStatement(
+            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
+                    inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
+                    inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
+                    where nl.leder_fnr = ?
+                       and nl.narmeste_leder_id = ?;
+                """
+        ).use { ps ->
+            ps.setString(1, lederFnr)
+            ps.setString(2, narmestelederId)
+            ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
+        }
+    }
+}
+
 fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult {
     return connection.use { connection ->
         val result = DeleteResult(
@@ -187,7 +204,7 @@ fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult {
     }
 }
 
-private fun deleteSykmeldte(connection: Connection, date: LocalDate) : Int {
+private fun deleteSykmeldte(connection: Connection, date: LocalDate): Int {
     return connection.prepareStatement("""delete from sykmeldt where latest_tom < ?;""").use { ps ->
         ps.setDate(1, Date.valueOf(date))
         ps.executeUpdate()

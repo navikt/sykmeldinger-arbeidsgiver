@@ -10,14 +10,13 @@ import no.nav.syfo.log
 import no.nav.syfo.sykmelding.db.deleteSykmeldinger
 import no.nav.syfo.util.Unbounded
 import java.time.LocalDate
-import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
 class DeleteSykmeldingService(val database: DatabaseInterface, val applicationState: ApplicationState) {
     @OptIn(ExperimentalTime::class)
     fun start() {
         GlobalScope.launch(Dispatchers.Unbounded) {
-            while(applicationState.ready) {
+            while (applicationState.ready) {
                 try {
                     val result = database.deleteSykmeldinger(getDeleteDate())
                     log.info("Deleted ${result.deletedSykmelding} sykmeldinger and ${result.deletedSykmeldt} sykmeldte")

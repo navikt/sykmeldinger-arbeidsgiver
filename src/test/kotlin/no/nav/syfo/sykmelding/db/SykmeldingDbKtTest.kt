@@ -156,13 +156,33 @@ class SykmeldingDbKtTest : Spek({
             database.getArbeidsgiverSykmeldinger("lederFnr").size shouldBeEqualTo 2
             database.getAnsatt(nl.narmesteLederId.toString(), "lederFnr") shouldBeEqualTo Ansatt("12345678901", "Fornavn Etternavn", "123456789", nl.narmesteLederId.toString())
         }
+
+        it("Get ArbeidsgiverSykmeldinger from leder fnr and narmeste leder id") {
+            val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
+                LocalDate.now(),
+                LocalDate.now()
+            )
+            val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
+            database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
+            narmestelederDb.insertOrUpdate(nl)
+            database.getArbeidsgiverSykmeldinger(lederFnr = nl.narmesteLederFnr, narmestelederId = nl.narmesteLederId.toString()).size shouldBeEqualTo 1
+
+            val nyArbeidsgiverSykmelding = getSykmeldingArbeidsgiverKafkaMessage(
+                LocalDate.now(),
+                LocalDate.now(),
+                sykmeldtFnr = "22221145712"
+            )
+
+            database.insertOrUpdateSykmeldingArbeidsgiver(nyArbeidsgiverSykmelding, person, nyArbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
+            database.getArbeidsgiverSykmeldinger(lederFnr = nl.narmesteLederFnr, narmestelederId = nl.narmesteLederId.toString()).size shouldBeEqualTo 1
+        }
     }
 })
 
-fun getSykmeldingArbeidsgiverKafkaMessage(fom: LocalDate, tom: LocalDate, uuid: String = UUID.randomUUID().toString()): SykmeldingArbeidsgiverKafkaMessage {
+fun getSykmeldingArbeidsgiverKafkaMessage(fom: LocalDate, tom: LocalDate, sykmeldingsId: String = UUID.randomUUID().toString(), sykmeldtFnr: String = "12345678901"): SykmeldingArbeidsgiverKafkaMessage {
     return SykmeldingArbeidsgiverKafkaMessage(
         event = SykmeldingStatusKafkaEventDTO(
-            sykmeldingId = "213",
+            sykmeldingId = sykmeldingsId,
             timestamp = OffsetDateTime.now(ZoneOffset.UTC),
             statusEvent = "SENDT",
             arbeidsgiver = ArbeidsgiverStatusDTO(
@@ -173,15 +193,15 @@ fun getSykmeldingArbeidsgiverKafkaMessage(fom: LocalDate, tom: LocalDate, uuid: 
             emptyList()
         ),
         kafkaMetadata = KafkaMetadataDTO(
-            "213", OffsetDateTime.now(ZoneOffset.UTC), fnr = "12345678901", source = "user"
+            sykmeldingsId, OffsetDateTime.now(ZoneOffset.UTC), fnr = sykmeldtFnr, source = "user"
         ),
-        sykmelding = getArbeidsgiverSykmelding(fom = fom, tom = tom)
+        sykmelding = getArbeidsgiverSykmelding(fom = fom, tom = tom, sykmeldingsId = sykmeldingsId)
     )
 }
 
-fun getArbeidsgiverSykmelding(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now()): ArbeidsgiverSykmelding {
+fun getArbeidsgiverSykmelding(fom: LocalDate = LocalDate.now(), tom: LocalDate = LocalDate.now(), sykmeldingsId: String = "123"): ArbeidsgiverSykmelding {
     return ArbeidsgiverSykmelding(
-        id = "123",
+        id = sykmeldingsId,
         mottattTidspunkt = OffsetDateTime.now(ZoneOffset.UTC),
         behandletTidspunkt = OffsetDateTime.now(ZoneOffset.UTC),
         meldingTilArbeidsgiver = "",
