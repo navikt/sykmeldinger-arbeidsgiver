@@ -75,18 +75,17 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
 
-            coEvery { dineSykmeldteService.getDineSykmeldte(any()) } returns
-                listOf(
-                    Sykmeldt(
-                        "lederId",
-                        "orgnr",
-                        "fnr",
-                        "Navn Navnesen",
-                        null
-                    )
-                )
-
             it("Skal returnere sykmeldt") {
+                coEvery { dineSykmeldteService.getDineSykmeldte(any()) } returns
+                    listOf(
+                        Sykmeldt(
+                            "lederId",
+                            "orgnr",
+                            "fnr",
+                            "Navn Navnesen",
+                            null
+                        )
+                    )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte") {
                         addHeader("Accept", "application/json")
@@ -109,16 +108,15 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
 
-            coEvery { dineSykmeldteService.getSykmeldt(any(), any()) } returns
-                Sykmeldt(
-                    "lederId",
-                    "orgnr",
-                    "fnr",
-                    "Navn Navnesen",
-                    null
-                )
-
             it("Skal returnere sykmeldt") {
+                coEvery { dineSykmeldteService.getSykmeldt(any(), any()) } returns
+                    Sykmeldt(
+                        "lederId",
+                        "orgnr",
+                        "fnr",
+                        "Navn Navnesen",
+                        null
+                    )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
                         addHeader("Accept", "application/json")
@@ -139,16 +137,15 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
 
-            coEvery { dineSykmeldteService.getSykmeldt(any(), eq("12345678912"), any()) } returns
-                Sykmeldt(
-                    "lederId",
-                    "orgnr",
-                    "fnr",
-                    "Navn Navnesen",
-                    null
-                )
-
             it("Skal returnere sykmeldt") {
+                coEvery { dineSykmeldteService.getSykmeldt(any(), eq("12345678912"), any()) } returns
+                    Sykmeldt(
+                        "lederId",
+                        "orgnr",
+                        "fnr",
+                        "Navn Navnesen",
+                        null
+                    )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId/2021-10-25") {
                         addHeader("Accept", "application/json")
