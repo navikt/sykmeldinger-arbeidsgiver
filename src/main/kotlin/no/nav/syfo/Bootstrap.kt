@@ -28,6 +28,7 @@ import no.nav.syfo.narmesteleder.kafka.NarmestelederConsumer
 import no.nav.syfo.narmesteleder.kafka.model.Narmesteleder
 import no.nav.syfo.pdl.client.PdlClient
 import no.nav.syfo.pdl.service.PdlPersonService
+import no.nav.syfo.sykmelding.DeleteSykmeldingService
 import no.nav.syfo.sykmelding.SykmeldingAivenService
 import no.nav.syfo.sykmelding.SykmeldingService
 import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
@@ -121,6 +122,8 @@ fun main() {
     SykmeldingAivenService(
         aivenKafkaSykmeldingConsumer, database, applicationState, env.syfoSendtSykmeldingTopicAiven, pdlPersonService, env.cluster
     ).startConsumer()
+
+    DeleteSykmeldingService(database, applicationState).start()
 }
 
 fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) =
