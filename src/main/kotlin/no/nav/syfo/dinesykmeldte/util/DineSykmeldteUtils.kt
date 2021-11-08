@@ -12,6 +12,7 @@ import no.nav.syfo.model.sykmelding.arbeidsgiver.BehandlerAGDTO
 import no.nav.syfo.model.sykmelding.arbeidsgiver.SykmeldingsperiodeAGDTO
 import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
+import java.time.LocalDate
 
 fun SykmeldingArbeidsgiverV2.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
     return DineSykmeldteSykmelding(
@@ -80,12 +81,19 @@ private fun SykmeldingsperiodeAGDTO.toPerioder(): Periode {
     )
 }
 
+fun List<SykmeldingsperiodeAGDTO>.isActive(date: LocalDate = LocalDate.now()): Boolean {
+    return any {
+        !it.fom.isAfter(date) && !date.isAfter(it.tom)
+    }
+}
+
 fun Ansatt.toSykmeldt(): Sykmeldt {
     return Sykmeldt(
         narmestelederId = this.narmestelederId,
         orgnummer = this.orgnummer,
         fnr = this.fnr,
         navn = this.navn,
-        sykmeldinger = null
+        sykmeldinger = null,
+        aktivSykmelding = this.aktivSykmelding
     )
 }

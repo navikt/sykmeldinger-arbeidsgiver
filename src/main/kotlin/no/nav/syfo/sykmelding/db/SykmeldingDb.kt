@@ -2,7 +2,6 @@ package no.nav.syfo.sykmelding.db
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.pdl.model.PdlPerson
 import no.nav.syfo.pdl.model.toFormattedNameString
 import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
@@ -45,34 +44,6 @@ private fun insertOrUpdateSykmeldt(
         ps.setString(index++, navn)
         ps.setDate(index, latestDate)
         ps.execute()
-    }
-}
-
-fun DatabaseInterface.getAnsatt(narmestelederId: String, lederFnr: String): Ansatt? {
-    return connection.use { connection ->
-        connection.prepareStatement(
-            """
-            select nl.narmeste_leder_id, s.pasient_fnr, s.pasient_navn, nl.orgnummer from narmesteleder as nl
-            inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
-            where nl.narmeste_leder_id = ? and nl.leder_fnr = ?;
-        """
-        ).use { ps ->
-            ps.setString(1, narmestelederId)
-            ps.setString(2, lederFnr)
-            ps.executeQuery().toAnsatt()
-        }
-    }
-}
-
-private fun ResultSet.toAnsatt(): Ansatt? {
-    return when (next()) {
-        false -> null
-        else -> Ansatt(
-            narmestelederId = getString("narmeste_leder_id"),
-            fnr = getString("pasient_fnr"),
-            orgnummer = getString("orgnummer"),
-            navn = getString("pasient_navn"),
-        )
     }
 }
 

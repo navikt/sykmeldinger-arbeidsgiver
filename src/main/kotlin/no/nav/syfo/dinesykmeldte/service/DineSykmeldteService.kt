@@ -1,6 +1,7 @@
 package no.nav.syfo.dinesykmeldte.service
 
 import no.nav.syfo.dinesykmeldte.model.Sykmeldt
+import no.nav.syfo.dinesykmeldte.util.isActive
 import no.nav.syfo.dinesykmeldte.util.toDineSykmeldteSykmelding
 import no.nav.syfo.dinesykmeldte.util.toSykmeldt
 import no.nav.syfo.narmesteleder.model.Ansatt
@@ -24,7 +25,8 @@ class DineSykmeldteService(
                 fnr = it.pasientFnr,
                 navn = it.navn,
                 orgnummer = it.orgnummer,
-                narmestelederId = it.narmestelederId
+                narmestelederId = it.narmestelederId,
+                aktivSykmelding = it.sykmelding.sykmeldingsperioder.isActive()
             )
         }
             .map { ansatt ->
@@ -33,7 +35,8 @@ class DineSykmeldteService(
                     orgnummer = ansatt.key.orgnummer,
                     fnr = ansatt.key.fnr,
                     ansatt.key.navn,
-                    sykmeldinger = ansatt.value.map { it.toDineSykmeldteSykmelding(ansatt.key) }
+                    sykmeldinger = ansatt.value.map { it.toDineSykmeldteSykmelding(ansatt.key) },
+                    aktivSykmelding = ansatt.key.aktivSykmelding
                 )
             }
     }
