@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.narmesteleder.model.Ansatt
+import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmelding
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmeldinger
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
@@ -22,19 +22,21 @@ internal class SykmeldingServiceTest : Spek({
 
     describe("Test av SykmeldingsService") {
 
-        val ansatt = Ansatt(
+        val ansatt = Sykmeldt(
             fnr = "pasientFnr",
             navn = "Fornavn Etternavn",
             orgnummer = "orgnummer",
             narmestelederId = "lederId",
-            aktivSykmelding = true
+            aktivSykmelding = true,
+            sykmeldinger = null
         )
-        val inaktivAnsatt = Ansatt(
+        val inaktivAnsatt = Sykmeldt(
             fnr = "pasientFnr",
             navn = "Fornavn Etternavn",
             orgnummer = "orgnummer",
             narmestelederId = "lederId",
-            aktivSykmelding = false
+            aktivSykmelding = false,
+            sykmeldinger = null
         )
 
         it("getSykmeldt filtrerer på dato") {
