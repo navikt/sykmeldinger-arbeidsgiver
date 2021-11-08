@@ -18,9 +18,11 @@ import no.nav.syfo.model.sykmeldingstatus.KafkaMetadataDTO
 import no.nav.syfo.model.sykmeldingstatus.SykmeldingStatusKafkaEventDTO
 import no.nav.syfo.narmesteleder.db.NarmestelederDB
 import no.nav.syfo.narmesteleder.kafka.model.Narmesteleder
+import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.pdl.model.Navn
 import no.nav.syfo.pdl.model.PdlPerson
 import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -144,15 +146,15 @@ class SykmeldingDbKtTest : Spek({
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
             database.getArbeidsgiverSykmeldinger("lederFnr").size shouldBeEqualTo 0
-//            database.getAnsatt(uuid, "lederFnr") shouldBe null
+            database.getAnsatt(uuid, "lederFnr") shouldBe null
             narmestelederDb.insertOrUpdate(nl)
             database.getArbeidsgiverSykmeldinger("lederFnr").size shouldBeEqualTo 1
-//            database.getAnsatt(nl.narmesteLederId.toString(), "lederFnr") shouldBeEqualTo Ansatt("12345678901", "Fornavn Mellomnavn Etternavn", "123456789", nl.narmesteLederId.toString())
+            database.getAnsatt(nl.narmesteLederId.toString(), "lederFnr") shouldBeEqualTo Ansatt("12345678901", "Fornavn Mellomnavn Etternavn", "123456789", nl.narmesteLederId.toString())
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding.copy(sykmelding = arbeidsgiverSykmelding.sykmelding.copy(id = "1234"), event = arbeidsgiverSykmelding.event.copy(arbeidsgiver = arbeidsgiverSykmelding.event.arbeidsgiver!!.copy(orgnummer = "123456788"))), person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
             database.getArbeidsgiverSykmeldinger("lederFnr").size shouldBeEqualTo 1
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding.copy(sykmelding = arbeidsgiverSykmelding.sykmelding.copy(id = "12345")), person.copy(navn = person.navn.copy(mellomnavn = null)), arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
             database.getArbeidsgiverSykmeldinger("lederFnr").size shouldBeEqualTo 2
-//            database.getAnsatt(nl.narmesteLederId.toString(), "lederFnr") shouldBeEqualTo Ansatt("12345678901", "Fornavn Etternavn", "123456789", nl.narmesteLederId.toString())
+            database.getAnsatt(nl.narmesteLederId.toString(), "lederFnr") shouldBeEqualTo Ansatt("12345678901", "Fornavn Etternavn", "123456789", nl.narmesteLederId.toString())
         }
 
         it("Get ArbeidsgiverSykmeldinger from leder fnr and narmeste leder id") {

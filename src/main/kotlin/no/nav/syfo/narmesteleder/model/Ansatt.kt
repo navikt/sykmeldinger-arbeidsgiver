@@ -5,5 +5,5 @@ data class Ansatt(
     val navn: String,
     val orgnummer: String,
     val narmestelederId: String,
-    val aktivSykmelding: Boolean
+    val aktivSykmelding: Boolean? = null
 )
