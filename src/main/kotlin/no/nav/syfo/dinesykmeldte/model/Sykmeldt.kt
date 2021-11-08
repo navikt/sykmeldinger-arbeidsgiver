@@ -5,5 +5,6 @@ data class Sykmeldt(
     val orgnummer: String,
     val fnr: String,
     val navn: String?,
-    val sykmeldinger: List<DineSykmeldteSykmelding>?
+    val sykmeldinger: List<DineSykmeldteSykmelding>?,
+    val aktivSykmelding: Boolean?
 )

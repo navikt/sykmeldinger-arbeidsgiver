@@ -26,7 +26,15 @@ internal class SykmeldingServiceTest : Spek({
             fnr = "pasientFnr",
             navn = "Fornavn Etternavn",
             orgnummer = "orgnummer",
-            narmestelederId = "lederId"
+            narmestelederId = "lederId",
+            aktivSykmelding = true
+        )
+        val inaktivAnsatt = Ansatt(
+            fnr = "pasientFnr",
+            navn = "Fornavn Etternavn",
+            orgnummer = "orgnummer",
+            narmestelederId = "lederId",
+            aktivSykmelding = false
         )
 
         it("getSykmeldt filtrerer på dato") {
@@ -75,6 +83,42 @@ internal class SykmeldingServiceTest : Spek({
             sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 11, 21)) shouldBeEqualTo ansatt
             sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 11, 30)) shouldBeEqualTo ansatt
             sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 11, 20)) shouldBeEqualTo null
+        }
+
+        it("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
+
+            every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
+                SykmeldingArbeidsgiverV2(
+                    "lederId",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
+                    getArbeidsgiverSykmelding(
+                        fom = LocalDate.of(2021, 10, 1),
+                        tom = LocalDate.of(2021, 10, 9)
+                    )
+                )
+            )
+            sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo inaktivAnsatt
+        }
+
+        it("getSykmeldt returnerer ansatt med aktivSykmelding = true") {
+
+            every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
+                SykmeldingArbeidsgiverV2(
+                    "lederId",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
+                    getArbeidsgiverSykmelding(
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusDays(1)
+                    )
+                )
+            )
+            sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo ansatt
         }
     }
 })

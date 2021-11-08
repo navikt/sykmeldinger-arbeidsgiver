@@ -72,6 +72,7 @@ private fun ResultSet.toAnsatt(): Ansatt? {
             fnr = getString("pasient_fnr"),
             orgnummer = getString("orgnummer"),
             navn = getString("pasient_navn"),
+            aktivSykmelding = null
         )
     }
 }

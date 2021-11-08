@@ -83,7 +83,8 @@ internal class DineSykmeldteApiKtTest : Spek({
                             "orgnr",
                             "fnr",
                             "Navn Navnesen",
-                            null
+                            null,
+                            aktivSykmelding = true
                         )
                     )
                 with(
@@ -102,7 +103,8 @@ internal class DineSykmeldteApiKtTest : Spek({
                             "orgnr",
                             "fnr",
                             "Navn Navnesen",
-                            null
+                            null,
+                            aktivSykmelding = true
                         )
                     )
                 }
@@ -115,7 +117,8 @@ internal class DineSykmeldteApiKtTest : Spek({
                         "orgnr",
                         "fnr",
                         "Navn Navnesen",
-                        null
+                        null,
+                        aktivSykmelding = true
                     )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
@@ -132,7 +135,8 @@ internal class DineSykmeldteApiKtTest : Spek({
                         "orgnr",
                         "fnr",
                         "Navn Navnesen",
-                        null
+                        null,
+                        aktivSykmelding = true
                     )
                 }
             }
@@ -144,7 +148,8 @@ internal class DineSykmeldteApiKtTest : Spek({
                         "orgnr",
                         "fnr",
                         "Navn Navnesen",
-                        null
+                        null,
+                        aktivSykmelding = true
                     )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId/2021-10-25") {
@@ -161,7 +166,8 @@ internal class DineSykmeldteApiKtTest : Spek({
                         "orgnr",
                         "fnr",
                         "Navn Navnesen",
-                        null
+                        null,
+                        aktivSykmelding = true
                     )
                 }
             }
