@@ -122,5 +122,33 @@ internal class SykmeldingServiceTest : Spek({
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo ansatt
         }
+        it("Getsykmeldt should return aktiv = true") {
+            every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
+                SykmeldingArbeidsgiverV2(
+                    "lederId",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
+                    getArbeidsgiverSykmelding(
+                        fom = LocalDate.now().minusDays(10),
+                        tom = LocalDate.now().minusDays(8)
+                    )
+                ),
+                SykmeldingArbeidsgiverV2(
+                    "lederId",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
+                    getArbeidsgiverSykmelding(
+                        fom = LocalDate.now().minusDays(7),
+                        tom = LocalDate.now().plusDays(8)
+                    )
+                ),
+            )
+            sykmeldingsService.getSykmeldt("lederId", "fnr")?.aktivSykmelding shouldBeEqualTo true
+
+        }
     }
 })
