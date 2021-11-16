@@ -33,16 +33,4 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
         }
     }
 
-    get("api/dinesykmeldte/{narmestelederId}/{date}") {
-        val narmestelederId = call.parameters["narmestelederId"]!!
-        val date = LocalDate.parse(call.parameters["date"]!!, DateTimeFormatter.ISO_DATE)
-        val principal: JWTPrincipal = call.authentication.principal()!!
-        val fnr = principal.payload.subject
-        when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, fnr, date)) {
-            null -> call.respond(HttpStatusCode.NotFound)
-            else -> {
-                call.respond(sykmeldt)
-            }
-        }
-    }
 }

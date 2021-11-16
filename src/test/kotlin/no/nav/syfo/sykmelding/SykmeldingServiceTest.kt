@@ -39,53 +39,6 @@ internal class SykmeldingServiceTest : Spek({
             sykmeldinger = null
         )
 
-        it("getSykmeldt filtrerer på dato") {
-
-            every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
-                SykmeldingArbeidsgiverV2(
-                    "lederId",
-                    "Fornavn Etternavn",
-                    "pasientFnr",
-                    "orgnummer",
-                    "Orgnavn",
-                    getArbeidsgiverSykmelding(
-                        fom = LocalDate.of(2021, 10, 1),
-                        tom = LocalDate.of(2021, 10, 9)
-                    )
-                ),
-                SykmeldingArbeidsgiverV2(
-                    "lederId",
-                    "Fornavn Etternavn",
-                    "pasientFnr",
-                    "orgnummer",
-                    "Orgnavn",
-                    getArbeidsgiverSykmelding(
-                        fom = LocalDate.of(2021, 10, 10),
-                        tom = LocalDate.of(2021, 10, 20)
-                    )
-                ),
-                SykmeldingArbeidsgiverV2(
-                    "lederId",
-                    "Fornavn Etternavn",
-                    "pasientFnr",
-                    "orgnummer",
-                    "Orgnavn",
-                    getArbeidsgiverSykmelding(
-                        fom = LocalDate.of(2021, 11, 21),
-                        tom = LocalDate.of(2021, 11, 30)
-                    )
-                )
-            )
-
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 10, 1)) shouldBeEqualTo ansatt
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 10, 9)) shouldBeEqualTo ansatt
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 10, 10)) shouldBeEqualTo ansatt
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 10, 20)) shouldBeEqualTo ansatt
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 10, 21)) shouldBeEqualTo null
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 11, 21)) shouldBeEqualTo ansatt
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 11, 30)) shouldBeEqualTo ansatt
-            sykmeldingsService.getSykmeldt("lederId", "fnr", LocalDate.of(2021, 11, 20)) shouldBeEqualTo null
-        }
 
         it("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
 

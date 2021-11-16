@@ -14,10 +14,6 @@ class DineSykmeldteService(
         return sykmeldingService.getSykmeldt(narmestelederId, fnr)
     }
 
-    fun getSykmeldt(narmestelederId: String, fnr: String, date: LocalDate): Sykmeldt? {
-        return sykmeldingService.getSykmeldt(narmestelederId, fnr, date)
-    }
-
     fun getDineSykmeldte(fnrLeder: String): List<Sykmeldt> {
         return sykmeldingService.getSykmeldinger(fnrLeder).groupBy {
             Ansatt(

@@ -33,23 +33,4 @@ class SykmeldingService(val database: DatabaseInterface) {
             )
         } else null
     }
-
-    /**
-     * Get a sykmeldt for a given narmesteleder + lederFnr filtered by active sykmelding
-     */
-    fun getSykmeldt(narmestelederId: String, lederFnr: String, date: LocalDate): Sykmeldt? {
-        return database.getArbeidsgiverSykmeldinger(lederFnr = lederFnr, narmestelederId = narmestelederId)
-            .firstOrNull {
-                it.sykmelding.sykmeldingsperioder.isActive(date)
-            }?.let {
-                Sykmeldt(
-                    narmestelederId = it.narmestelederId,
-                    orgnummer = it.orgnummer,
-                    fnr = it.pasientFnr,
-                    navn = it.navn,
-                    sykmeldinger = null,
-                    aktivSykmelding = true
-                )
-            }
-    }
 }

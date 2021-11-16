@@ -141,40 +141,9 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
 
-            it("Skal returnere sykmeldt") {
-                coEvery { dineSykmeldteService.getSykmeldt(any(), eq("12345678912"), any()) } returns
-                    Sykmeldt(
-                        "lederId",
-                        "orgnr",
-                        "fnr",
-                        "Navn Navnesen",
-                        null,
-                        aktivSykmelding = true
-                    )
-                with(
-                    handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId/2021-10-25") {
-                        addHeader("Accept", "application/json")
-                        addHeader("Content-Type", "application/json")
-                        addHeader(HttpHeaders.Authorization, "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}")
-                    }
-                ) {
-                    response.status() shouldBeEqualTo HttpStatusCode.OK
-                    val sykmeldt = objectMapper.readValue<Sykmeldt>(response.content!!)
-
-                    sykmeldt shouldBeEqualTo Sykmeldt(
-                        "lederId",
-                        "orgnr",
-                        "fnr",
-                        "Navn Navnesen",
-                        null,
-                        aktivSykmelding = true
-                    )
-                }
-            }
-
             it("Skal returnere 401 Unauthorized hvis auth header mangler") {
                 with(
-                    handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId/2021-10-25") {
+                    handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
                         addHeader("Accept", "application/json")
                         addHeader("Content-Type", "application/json")
                     }
