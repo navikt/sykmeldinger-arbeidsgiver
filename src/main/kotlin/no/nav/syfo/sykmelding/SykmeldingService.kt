@@ -5,7 +5,6 @@ import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.dinesykmeldte.util.isActive
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmeldinger
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
-import java.time.LocalDate
 
 class SykmeldingService(val database: DatabaseInterface) {
     fun getSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiverV2> {

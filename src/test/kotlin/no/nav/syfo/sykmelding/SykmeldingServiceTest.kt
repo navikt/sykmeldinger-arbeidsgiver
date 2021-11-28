@@ -39,7 +39,6 @@ internal class SykmeldingServiceTest : Spek({
             sykmeldinger = null
         )
 
-
         it("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
 
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
@@ -101,7 +100,6 @@ internal class SykmeldingServiceTest : Spek({
                 ),
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr")?.aktivSykmelding shouldBeEqualTo true
-
         }
     }
 })

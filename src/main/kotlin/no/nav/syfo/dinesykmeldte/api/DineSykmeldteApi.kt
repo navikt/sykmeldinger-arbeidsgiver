@@ -9,8 +9,6 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
     get("api/dinesykmeldte") {
@@ -32,5 +30,4 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
             }
         }
     }
-
 }

@@ -21,6 +21,7 @@ class NarmestelederConsumer(
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(NarmestelederConsumer::class.java)
+        private const val POLL_DURATION_SECONDS = 10L
     }
 
     fun startConsumer() {
@@ -40,7 +41,7 @@ class NarmestelederConsumer(
     private fun start() {
         kafkaConsumer.subscribe(listOf(narmestelederTopic))
         while (applicationState.ready) {
-            kafkaConsumer.poll(Duration.ofMillis(1000)).map { it.value() }.forEach {
+            kafkaConsumer.poll(Duration.ofSeconds(POLL_DURATION_SECONDS)).map { it.value() }.forEach {
                 when (it.aktivTom) {
                     null -> narmestelederDB.insertOrUpdate(it)
                     else -> narmestelederDB.deleteNarmesteleder(it)

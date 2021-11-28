@@ -85,7 +85,7 @@ fun main() {
     val aivenKafkaConsumer = KafkaConsumer(
         KafkaUtils.getAivenKafkaConfig().also {
             it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
-            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
         }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
         StringDeserializer(),
         JacksonKafkaDeserializer(Narmesteleder::class)
@@ -113,7 +113,7 @@ fun main() {
     val aivenKafkaSykmeldingConsumer = KafkaConsumer(
         KafkaUtils.getAivenKafkaConfig().also {
             it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
-            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
         }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
         StringDeserializer(),
         JacksonKafkaDeserializer(SykmeldingArbeidsgiverKafkaMessage::class)

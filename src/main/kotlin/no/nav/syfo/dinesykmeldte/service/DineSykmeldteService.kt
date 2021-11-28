@@ -5,7 +5,6 @@ import no.nav.syfo.dinesykmeldte.util.isActive
 import no.nav.syfo.dinesykmeldte.util.toDineSykmeldteSykmelding
 import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.sykmelding.SykmeldingService
-import java.time.LocalDate
 
 class DineSykmeldteService(
     private val sykmeldingService: SykmeldingService

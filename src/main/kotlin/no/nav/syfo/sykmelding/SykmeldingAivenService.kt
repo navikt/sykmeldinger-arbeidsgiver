@@ -28,6 +28,7 @@ class SykmeldingAivenService(
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(SykmeldingAivenService::class.java)
+        private const val POLL_DURATION_SECONDS = 10L
     }
 
     private var lastLogTime = Instant.now().toEpochMilli()
@@ -51,13 +52,12 @@ class SykmeldingAivenService(
     suspend fun start() {
         var processedMessages = 0
         while (applicationState.ready) {
-            val sykmeldinger = kafkaConsumer.poll(Duration.ZERO)
+            val sykmeldinger = kafkaConsumer.poll(Duration.ofSeconds(POLL_DURATION_SECONDS))
             sykmeldinger.forEach {
                 handleSykmelding(it.key(), it.value())
             }
             processedMessages += sykmeldinger.count()
             processedMessages = logProcessedMessages(processedMessages)
-            delay(1)
         }
     }
 

@@ -43,11 +43,11 @@ spec:
     path: /internal/prometheus
   resources:
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 250m
+      memory: 500Gi
     requests:
-      cpu: 400m
-      memory: 768Mi
+      cpu: 100m
+      memory: 500Mi
   vault:
     enabled: false
   ingresses:
