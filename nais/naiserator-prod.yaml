@@ -44,10 +44,10 @@ spec:
   resources:
     limits:
       cpu: 250m
-      memory: 500Gi
+      memory: 1Gi
     requests:
       cpu: 100m
-      memory: 500Mi
+      memory: 1Gi
   vault:
     enabled: false
   ingresses:
