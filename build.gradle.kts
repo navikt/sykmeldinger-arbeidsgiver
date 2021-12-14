@@ -5,33 +5,32 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val coroutinesVersion = "1.4.2"
+val coroutinesVersion = "1.5.2"
 val jacksonVersion = "2.12.0"
-val kluentVersion = "1.61"
-val ktorVersion = "1.5.0"
-val logbackVersion = "1.2.3"
-val logstashEncoderVersion = "6.5"
-val prometheusVersion = "0.9.0"
-val spekVersion = "2.0.9"
-val smCommonVersion = "1.88ca328"
-val mockkVersion = "1.10.3"
+val kluentVersion = "1.68"
+val ktorVersion = "1.6.7"
+val logbackVersion = "1.2.7"
+val logstashEncoderVersion = "6.6"
+val prometheusVersion = "0.12.0"
+val spekVersion = "2.0.17"
+val smCommonVersion = "1.a92720c"
+val mockkVersion = "1.12.0"
 val nimbusdsVersion = "9.2"
-val testContainerVersion = "1.15.3"
-val flywayVersion = "5.2.4"
-val hikariVersion = "3.3.0"
-val postgresVersion = "42.2.18"
-val swaggerUiVersion = "3.10.0"
+val hikariVersion = "5.0.0"
+val flywayVersion = "7.15.0"
+val postgresVersion = "42.2.24"
+val testContainerVersion = "1.16.2"
+val kotlinVersion = "1.6.0"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
 }
 
 plugins {
-    id("org.jmailen.kotlinter") version "3.3.0"
-    kotlin("jvm") version "1.5.30"
-    id("com.diffplug.spotless") version "5.8.2"
+    id("org.jmailen.kotlinter") version "3.6.0"
+    kotlin("jvm") version "1.6.0"
+    id("com.diffplug.spotless") version "5.16.0"
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("org.hidetake.swagger.generator") version "2.18.1" apply true
     jacoco
 }
 
@@ -45,11 +44,6 @@ val githubPassword: String by project
 
 repositories {
     mavenCentral()
-    jcenter()
-    maven(url = "https://dl.bintray.com/kotlin/ktor")
-    maven(url = "https://dl.bintray.com/spekframework/spek-dev")
-    maven(url = "https://packages.confluent.io/maven/")
-    maven(url = "https://kotlin.bintray.com/kotlinx")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/syfosm-common")
         credentials {
@@ -75,27 +69,27 @@ dependencies {
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
 
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-
-    implementation("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
 
-    swaggerUI( "org.webjars:swagger-ui:$swaggerUiVersion")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.postgresql:postgresql:$postgresVersion")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.testcontainers:postgresql:$testContainerVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
-    testImplementation("org.testcontainers:kafka:$testContainerVersion")
-    testImplementation("org.testcontainers:postgresql:$testContainerVersion")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
@@ -104,12 +98,6 @@ dependencies {
     }
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
-    }
-}
-
-swaggerSources {
-    create("sykmeldinger-arbeidsgiver").apply {
-        setInputFile(file("api/oas3/sykmeldinger-arbeidsgiver-api.yaml"))
     }
 }
 
@@ -128,11 +116,7 @@ tasks {
     }
 
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "12"
-    }
-
-    withType<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
-        outputDir = File(buildDir.path + "/resources/main/api")
+        kotlinOptions.jvmTarget = "17"
     }
 
     withType<JacocoReport> {
@@ -148,7 +132,6 @@ tasks {
             setPath("META-INF/cxf")
             include("bus-extensions.txt")
         }
-        dependsOn("generateSwaggerUI")
     }
 
     withType<Test> {

@@ -10,10 +10,10 @@ import no.nav.syfo.dinesykmeldte.model.Periode
 import no.nav.syfo.model.sykmelding.arbeidsgiver.BehandlerAGDTO
 import no.nav.syfo.model.sykmelding.arbeidsgiver.SykmeldingsperiodeAGDTO
 import no.nav.syfo.narmesteleder.model.Ansatt
-import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import java.time.LocalDate
 
-fun SykmeldingArbeidsgiverV2.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
+fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
     return DineSykmeldteSykmelding(
         pasient = Pasient(
             fnr = pasientFnr,
@@ -51,10 +51,11 @@ fun getSykmelderNavn(behandlerDTO: BehandlerAGDTO): String {
     }
 }
 
-private fun capitalizeFirstLetter(string: String): String {
-    return string.toLowerCase()
-        .split(" ").joinToString(" ") { it.capitalize() }
-        .split("-").joinToString("-") { it.capitalize() }.trimEnd()
+fun capitalizeFirstLetter(string: String): String {
+    return string.lowercase()
+        .split(" ").joinToString(" ") { it.replaceFirstChar { char -> char.titlecaseChar() } }
+        .split("-").joinToString("-") { it.replaceFirstChar { char -> char.titlecaseChar() } }
+        .trimEnd()
 }
 
 fun getAktivitetIkkeMuligBeskrivelse(sykmeldingsperioder: List<SykmeldingsperiodeAGDTO>): String {
@@ -65,7 +66,7 @@ fun getAktivitetIkkeMulig(sykmeldingsperioder: List<SykmeldingsperiodeAGDTO>): L
     return sykmeldingsperioder.mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak }.flatMap { it.arsak }.map { it.name }.distinct()
 }
 
-private fun SykmeldingArbeidsgiverV2.getPerioder(): List<Periode> {
+private fun SykmeldingArbeidsgiver.getPerioder(): List<Periode> {
     return sykmelding.sykmeldingsperioder.map { it.toPerioder() }
 }
 

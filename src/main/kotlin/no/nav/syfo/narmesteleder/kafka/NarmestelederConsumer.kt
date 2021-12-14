@@ -1,5 +1,6 @@
 package no.nav.syfo.narmesteleder.kafka
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -24,6 +25,7 @@ class NarmestelederConsumer(
         private const val POLL_DURATION_SECONDS = 10L
     }
 
+    @DelicateCoroutinesApi
     fun startConsumer() {
         GlobalScope.launch(Dispatchers.Unbounded) {
             while (applicationState.ready) {

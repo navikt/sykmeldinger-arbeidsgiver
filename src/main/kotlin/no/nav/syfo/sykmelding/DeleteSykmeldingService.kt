@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -10,10 +11,10 @@ import no.nav.syfo.log
 import no.nav.syfo.sykmelding.db.deleteSykmeldinger
 import no.nav.syfo.util.Unbounded
 import java.time.LocalDate
-import kotlin.time.ExperimentalTime
 
 class DeleteSykmeldingService(val database: DatabaseInterface, val applicationState: ApplicationState) {
-    @OptIn(ExperimentalTime::class)
+
+    @DelicateCoroutinesApi
     fun start() {
         GlobalScope.launch(Dispatchers.Unbounded) {
             while (applicationState.ready) {

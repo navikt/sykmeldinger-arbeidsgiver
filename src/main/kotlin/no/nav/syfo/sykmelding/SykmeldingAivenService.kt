@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -34,6 +35,7 @@ class SykmeldingAivenService(
     private var lastLogTime = Instant.now().toEpochMilli()
     private val logTimer = 60_000L
     private var ignoredSykmeldinger = 0
+    @DelicateCoroutinesApi
     fun startConsumer() {
         GlobalScope.launch(Dispatchers.Unbounded) {
             while (applicationState.ready) {

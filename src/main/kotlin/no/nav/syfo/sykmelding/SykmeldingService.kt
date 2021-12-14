@@ -4,10 +4,10 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.dinesykmeldte.util.isActive
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmeldinger
-import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 
 class SykmeldingService(val database: DatabaseInterface) {
-    fun getSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiverV2> {
+    fun getSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiver> {
         return database.getArbeidsgiverSykmeldinger(lederFnr)
     }
 

@@ -1,5 +1,7 @@
 package no.nav.syfo.pdl.model
 
+import no.nav.syfo.dinesykmeldte.util.capitalizeFirstLetter
+
 data class PdlPerson(
     val navn: Navn,
     val aktorId: String?
@@ -17,10 +19,4 @@ fun Navn.toFormattedNameString(): String {
     } else {
         capitalizeFirstLetter("$fornavn $mellomnavn $etternavn")
     }
-}
-
-private fun capitalizeFirstLetter(string: String): String {
-    return string.toLowerCase()
-        .split(" ").joinToString(" ") { it.capitalize() }
-        .split("-").joinToString("-") { it.capitalize() }.trimEnd()
 }
