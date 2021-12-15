@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val coroutinesVersion = "1.5.2"
+val coroutinesVersion = "1.5.1"
 val jacksonVersion = "2.12.0"
 val kluentVersion = "1.68"
 val ktorVersion = "1.6.7"
@@ -21,6 +21,7 @@ val flywayVersion = "7.15.0"
 val postgresVersion = "42.2.24"
 val testContainerVersion = "1.16.2"
 val kotlinVersion = "1.6.0"
+val swaggerUiVersion = "4.1.2"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
@@ -31,6 +32,7 @@ plugins {
     kotlin("jvm") version "1.6.0"
     id("com.diffplug.spotless") version "5.16.0"
     id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("org.hidetake.swagger.generator") version "2.18.2" apply true
     jacoco
 }
 
@@ -71,7 +73,7 @@ dependencies {
 
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
-
+    swaggerUI( "org.webjars:swagger-ui:$swaggerUiVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
@@ -100,7 +102,11 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 }
-
+swaggerSources {
+    create("sykmeldinger-arbeidsgiver").apply {
+        setInputFile(file("api/oas3/sykmeldinger-arbeidsgiver-api.yaml"))
+    }
+}
 tasks.jacocoTestReport {
     reports {
         xml.isEnabled = true
@@ -117,6 +123,9 @@ tasks {
 
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
+    }
+    withType<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
+        outputDir = File(buildDir.path + "/resources/main/api")
     }
 
     withType<JacocoReport> {
@@ -139,6 +148,7 @@ tasks {
             includeEngines("spek2")
         }
         testLogging.showStandardStreams = true
+        dependsOn("generateSwaggerUI")
     }
 
     "check" {
