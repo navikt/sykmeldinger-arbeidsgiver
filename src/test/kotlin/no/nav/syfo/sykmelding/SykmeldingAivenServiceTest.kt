@@ -44,7 +44,6 @@ class SykmeldingAivenServiceTest : Spek({
     }
     describe("Test handling sykmelding") {
         it("Test lagring av sykmelding") {
-            val sykmeldingKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(LocalDate.now(), LocalDate.now())
             val consumerRecords = ConsumerRecords<String, SykmeldingArbeidsgiverKafkaMessage?>(
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(

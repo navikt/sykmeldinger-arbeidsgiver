@@ -6,7 +6,7 @@ import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.pdl.model.PdlPerson
 import no.nav.syfo.pdl.model.toFormattedNameString
 import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
-import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import no.nav.syfo.util.objectMapper
 import org.postgresql.util.PGobject
 import java.sql.Connection
@@ -161,7 +161,7 @@ private fun insertOrUpdateArbeidsgiverSykmelding(
     }
 }
 
-fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiverV2> {
+fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiver> {
     return connection.use { connection ->
         connection.prepareStatement(
             """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
@@ -176,7 +176,7 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<Sykmel
     }
 }
 
-fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelederId: String): List<SykmeldingArbeidsgiverV2> {
+fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelederId: String): List<SykmeldingArbeidsgiver> {
     return connection.use { connection ->
         connection.prepareStatement(
             """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
@@ -193,15 +193,13 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelede
     }
 }
 
-fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult {
-    return connection.use { connection ->
-        val result = DeleteResult(
-            deletedSykmelding = deleteSykmeldinger(connection, date),
-            deletedSykmeldt = deleteSykmeldte(connection, date)
-        )
-        connection.commit()
-        return result
-    }
+fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult = connection.use { connection ->
+    val result = DeleteResult(
+        deletedSykmelding = deleteSykmeldinger(connection, date),
+        deletedSykmeldt = deleteSykmeldte(connection, date)
+    )
+    connection.commit()
+    return result
 }
 
 private fun deleteSykmeldte(connection: Connection, date: LocalDate): Int {
@@ -218,8 +216,8 @@ private fun deleteSykmeldinger(connection: Connection, date: LocalDate): Int {
     }
 }
 
-fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiverV2 {
-    return SykmeldingArbeidsgiverV2(
+fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiver {
+    return SykmeldingArbeidsgiver(
         narmestelederId = getString("narmeste_leder_id"),
         pasientFnr = getString("pasient_fnr"),
         orgnummer = getString("orgnummer"),

@@ -7,7 +7,7 @@ import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmelding
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmeldinger
-import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiverV2
+import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -42,7 +42,7 @@ internal class SykmeldingServiceTest : Spek({
         it("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
 
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
-                SykmeldingArbeidsgiverV2(
+                SykmeldingArbeidsgiver(
                     "lederId",
                     "Fornavn Etternavn",
                     "pasientFnr",
@@ -60,7 +60,7 @@ internal class SykmeldingServiceTest : Spek({
         it("getSykmeldt returnerer ansatt med aktivSykmelding = true") {
 
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
-                SykmeldingArbeidsgiverV2(
+                SykmeldingArbeidsgiver(
                     "lederId",
                     "Fornavn Etternavn",
                     "pasientFnr",
@@ -76,7 +76,7 @@ internal class SykmeldingServiceTest : Spek({
         }
         it("Getsykmeldt should return aktiv = true") {
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
-                SykmeldingArbeidsgiverV2(
+                SykmeldingArbeidsgiver(
                     "lederId",
                     "Fornavn Etternavn",
                     "pasientFnr",
@@ -87,7 +87,7 @@ internal class SykmeldingServiceTest : Spek({
                         tom = LocalDate.now().minusDays(8)
                     )
                 ),
-                SykmeldingArbeidsgiverV2(
+                SykmeldingArbeidsgiver(
                     "lederId",
                     "Fornavn Etternavn",
                     "pasientFnr",
