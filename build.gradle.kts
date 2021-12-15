@@ -31,7 +31,7 @@ plugins {
     id("org.jmailen.kotlinter") version "3.6.0"
     kotlin("jvm") version "1.6.0"
     id("com.diffplug.spotless") version "5.16.0"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
     id("org.hidetake.swagger.generator") version "2.18.2" apply true
     jacoco
 }
