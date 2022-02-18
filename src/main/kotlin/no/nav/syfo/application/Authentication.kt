@@ -27,7 +27,13 @@ fun Application.setupAuth(jwkProviderLoginservice: JwkProvider, env: Environment
             verifier(jwkProviderLoginservice, loginserviceIssuer)
             validate { credentials ->
                 when {
-                    hasLoginserviceIdportenClientIdAudience(credentials, env.loginserviceIdportenAudience) && erNiva4(credentials) -> JWTPrincipal(credentials.payload)
+                    hasLoginserviceIdportenClientIdAudience(credentials, env.loginserviceIdportenAudience) && erNiva4(credentials) -> {
+                        val principal = JWTPrincipal(credentials.payload)
+                        BrukerPrincipal(
+                            fnr = finnFnrFraToken(principal),
+                            principal = principal
+                        )
+                    }
                     else -> unauthorized(credentials)
                 }
             }
@@ -57,3 +63,18 @@ fun hasLoginserviceIdportenClientIdAudience(credentials: JWTCredential, loginser
 fun erNiva4(credentials: JWTCredential): Boolean {
     return "Level4" == credentials.payload.getClaim("acr").asString()
 }
+
+fun finnFnrFraToken(principal: JWTPrincipal): String {
+    return if (principal.payload.getClaim("pid") != null && !principal.payload.getClaim("pid").asString().isNullOrEmpty()) {
+        log.debug("Bruker fnr fra pid-claim")
+        principal.payload.getClaim("pid").asString()
+    } else {
+        log.debug("Bruker fnr fra subject")
+        principal.payload.subject
+    }
+}
+
+data class BrukerPrincipal(
+    val fnr: String,
+    val principal: JWTPrincipal
+) : Principal
