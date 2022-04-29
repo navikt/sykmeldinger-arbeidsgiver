@@ -5,17 +5,17 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.auth.authenticate
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.StatusPages
+import io.kotest.core.spec.style.FunSpec
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.jackson.jackson
-import io.ktor.response.respond
-import io.ktor.routing.routing
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
+import io.ktor.server.routing.routing
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.mockk.coEvery
@@ -28,12 +28,10 @@ import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
 import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
 import testutil.generateJWTLoginservice
 import java.nio.file.Paths
 
-internal class DineSykmeldteApiKtTest : Spek({
+class DineSykmeldteApiKtTest : FunSpec({
 
     val path = "src/test/resources/jwkset.json"
     val uri = Paths.get(path).toUri().toURL()
@@ -43,7 +41,7 @@ internal class DineSykmeldteApiKtTest : Spek({
     }
     val dineSykmeldteService = mockk<DineSykmeldteService>()
 
-    describe("Test av Dine Sykmeldte API") {
+    context("Test av Dine Sykmeldte API") {
 
         with(TestApplicationEngine()) {
             start()
@@ -68,14 +66,14 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
             application.install(StatusPages) {
-                exception<Throwable> { cause ->
+                exception<Throwable> { call, cause ->
                     call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
                     log.error("Caught exception", cause)
                     throw cause
                 }
             }
 
-            it("Skal returnere sykmeldt") {
+            test("Skal returnere sykmeldt") {
                 coEvery { dineSykmeldteService.getDineSykmeldte(any()) } returns
                     listOf(
                         Sykmeldt(
@@ -110,7 +108,7 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
 
-            it("Skal returnere sykmeldt") {
+            test("Skal returnere sykmeldt") {
                 coEvery { dineSykmeldteService.getSykmeldt(any(), any()) } returns
                     Sykmeldt(
                         "lederId",
@@ -141,7 +139,7 @@ internal class DineSykmeldteApiKtTest : Spek({
                 }
             }
 
-            it("Skal returnere 401 Unauthorized hvis auth header mangler") {
+            test("Skal returnere 401 Unauthorized hvis auth header mangler") {
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
                         addHeader("Accept", "application/json")

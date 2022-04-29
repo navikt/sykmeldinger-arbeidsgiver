@@ -1,12 +1,12 @@
 package no.nav.syfo.sykmelding
 
+import io.kotest.core.spec.style.FunSpec
 import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.pdl.model.Navn
@@ -19,12 +19,10 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
 import java.time.Duration
 import java.time.LocalDate
 
-class SykmeldingAivenServiceTest : Spek({
+class SykmeldingAivenServiceTest : FunSpec({
     val database = mockk<DatabaseInterface>(relaxed = true)
     val kafkaConsumer = mockk<KafkaConsumer<String, SykmeldingArbeidsgiverKafkaMessage?>>()
     val topic = "teamsykmelding.sendt-sykmelding-topic"
@@ -33,17 +31,17 @@ class SykmeldingAivenServiceTest : Spek({
 
     val sykmeldingConsumer = SykmeldingAivenService(kafkaConsumer, database, applicationState, topic, pdlService, "test")
     mockkStatic("no.nav.syfo.sykmelding.db.SykmeldingDbKt")
-    afterEachTest {
+    afterTest {
         clearMocks(database, kafkaConsumer, pdlService, applicationState)
         mockkStatic("no.nav.syfo.sykmelding.db.SykmeldingDbKt")
     }
-    beforeEachTest {
+    beforeTest {
         every { kafkaConsumer.subscribe(any<List<String>>()) } returns Unit
         coEvery { pdlService.getPerson(any(), any()) } returns PdlPerson(Navn("fornavn", null, "etternavn"), null)
         every { database.insertOrUpdateSykmeldingArbeidsgiver(any(), any(), any()) } returns Unit
     }
-    describe("Test handling sykmelding") {
-        it("Test lagring av sykmelding") {
+    context("Test handling sykmelding") {
+        test("Test lagring av sykmelding") {
             val consumerRecords = ConsumerRecords<String, SykmeldingArbeidsgiverKafkaMessage?>(
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(
@@ -59,12 +57,12 @@ class SykmeldingAivenServiceTest : Spek({
             )
             every { applicationState.ready } returns true andThen false
             every { kafkaConsumer.poll(any<Duration>()) } returns consumerRecords
-            runBlocking {
-                sykmeldingConsumer.start()
-            }
+
+            sykmeldingConsumer.start()
+
             verify(exactly = 1) { database.insertOrUpdateSykmeldingArbeidsgiver(any(), any(), any()) }
         }
-        it("test ignore old sykmelding") {
+        test("test ignore old sykmelding") {
             val consumerRecords = ConsumerRecords<String, SykmeldingArbeidsgiverKafkaMessage?>(
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(
@@ -80,9 +78,9 @@ class SykmeldingAivenServiceTest : Spek({
             )
             every { applicationState.ready } returns true andThen false
             every { kafkaConsumer.poll(any<Duration>()) } returns consumerRecords
-            runBlocking {
-                sykmeldingConsumer.start()
-            }
+
+            sykmeldingConsumer.start()
+
             verify(exactly = 0) { database.insertOrUpdateSykmeldingArbeidsgiver(any(), any(), any()) }
         }
     }
