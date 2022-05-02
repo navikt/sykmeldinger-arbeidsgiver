@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding.db
 
+import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.syfo.Environment
@@ -24,8 +25,6 @@ import no.nav.syfo.pdl.model.PdlPerson
 import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
 import org.testcontainers.containers.PostgreSQLContainer
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -34,7 +33,7 @@ import java.util.UUID
 
 class PsqlContainer : PostgreSQLContainer<PsqlContainer>("postgres:12")
 
-class SykmeldingDbKtTest : Spek({
+class SykmeldingDbKtTest : FunSpec({
 
     val mockEnv = mockk<Environment>(relaxed = true)
     every { mockEnv.databaseUsername } returns "username"
@@ -58,7 +57,7 @@ class SykmeldingDbKtTest : Spek({
     val nl = Narmesteleder(nlId, "12345678901", orgnummer = "123456789", narmesteLederFnr = "lederFnr", narmesteLederTelefonnummer = "telefon", narmesteLederEpost = "epost", aktivFom = LocalDate.now(), aktivTom = null, arbeidsgiverForskutterer = true, OffsetDateTime.now())
     narmestelederDb.insertOrUpdate(nl)
 
-    beforeEachTest {
+    beforeTest {
         database.connection.use {
             it.prepareStatement(
                 """
@@ -73,8 +72,8 @@ class SykmeldingDbKtTest : Spek({
         }
     }
 
-    describe("test database") {
-        it("Save ArbeidsgiverSykmelding") {
+    context("test database") {
+        test("Save ArbeidsgiverSykmelding") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
                 LocalDate.now()
@@ -90,7 +89,7 @@ class SykmeldingDbKtTest : Spek({
             savedSykmelding.sykmelding shouldBeEqualTo arbeidsgiverSykmelding.sykmelding
         }
 
-        it("test should delete") {
+        test("test should delete") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 fom = LocalDate.of(2021, 1, 1),
                 tom = LocalDate.of(2021, 2, 1)
@@ -102,7 +101,7 @@ class SykmeldingDbKtTest : Spek({
             updated.deletedSykmelding shouldBeEqualTo 1
         }
 
-        it("test should not delete") {
+        test("test should not delete") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 fom = LocalDate.of(2021, 1, 1),
                 tom = LocalDate.of(2021, 2, 1)
@@ -114,7 +113,7 @@ class SykmeldingDbKtTest : Spek({
             updated.deletedSykmelding shouldBeEqualTo 0
         }
 
-        it("Save ArbeidsgiverSykmelding with updated name and tom") {
+        test("Save ArbeidsgiverSykmelding with updated name and tom") {
 
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
@@ -137,7 +136,7 @@ class SykmeldingDbKtTest : Spek({
             }
         }
 
-        it("Get ArbeidsgiverSykmeldinger from leder fnr") {
+        test("Get ArbeidsgiverSykmeldinger from leder fnr") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
                 LocalDate.now()
@@ -157,7 +156,7 @@ class SykmeldingDbKtTest : Spek({
             database.getAnsatt(nl.narmesteLederId.toString(), "lederFnr") shouldBeEqualTo Ansatt("12345678901", "Fornavn Etternavn", "123456789", nl.narmesteLederId.toString())
         }
 
-        it("Get ArbeidsgiverSykmeldinger from leder fnr and narmeste leder id") {
+        test("Get ArbeidsgiverSykmeldinger from leder fnr and narmeste leder id") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
                 LocalDate.now()

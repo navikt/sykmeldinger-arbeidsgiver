@@ -6,23 +6,22 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.application.ApplicationCallPipeline
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.auth.authenticate
-import io.ktor.features.CORS
-import io.ktor.features.CallId
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.StatusPages
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.jackson.jackson
-import io.ktor.response.respond
-import io.ktor.routing.routing
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.ApplicationCallPipeline
+import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.plugins.callid.CallId
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.CORS
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
+import io.ktor.server.routing.routing
 import no.nav.syfo.Environment
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.api.setupSwaggerDocApi
@@ -52,12 +51,12 @@ fun createApplicationEngine(
 
         setupAuth(jwkProviderLoginservice = jwkProvider, env = env, loginserviceIssuer = loginserviceIssuer)
         install(CORS) {
-            method(HttpMethod.Get)
-            method(HttpMethod.Options)
+            allowMethod(HttpMethod.Get)
+            allowMethod(HttpMethod.Options)
             env.allowedOrigin.forEach {
                 hosts.add("https://$it")
             }
-            header("nav_csrf_protection")
+            allowHeader("nav_csrf_protection")
             allowCredentials = true
             allowNonSimpleContentTypes = true
         }
@@ -67,7 +66,7 @@ fun createApplicationEngine(
             header(HttpHeaders.XCorrelationId)
         }
         install(StatusPages) {
-            exception<Throwable> { cause ->
+            exception<Throwable> { call, cause ->
                 log.error("Caught exception", cause)
                 call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
             }

@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding
 
+import io.kotest.core.spec.style.FunSpec
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -9,18 +10,16 @@ import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmelding
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmeldinger
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import org.amshove.kluent.shouldBeEqualTo
-import org.spekframework.spek2.Spek
-import org.spekframework.spek2.style.specification.describe
 import java.time.LocalDate
 
-internal class SykmeldingServiceTest : Spek({
+class SykmeldingServiceTest : FunSpec({
 
     val database = mockk<DatabaseInterface>(relaxed = true)
     val sykmeldingsService = SykmeldingService(database)
 
     mockkStatic("no.nav.syfo.sykmelding.db.SykmeldingDbKt")
 
-    describe("Test av SykmeldingsService") {
+    context("Test av SykmeldingsService") {
 
         val ansatt = Sykmeldt(
             fnr = "pasientFnr",
@@ -39,7 +38,7 @@ internal class SykmeldingServiceTest : Spek({
             sykmeldinger = null
         )
 
-        it("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
+        test("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
 
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
                 SykmeldingArbeidsgiver(
@@ -57,7 +56,7 @@ internal class SykmeldingServiceTest : Spek({
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo inaktivAnsatt
         }
 
-        it("getSykmeldt returnerer ansatt med aktivSykmelding = true") {
+        test("getSykmeldt returnerer ansatt med aktivSykmelding = true") {
 
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
                 SykmeldingArbeidsgiver(
@@ -74,7 +73,7 @@ internal class SykmeldingServiceTest : Spek({
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo ansatt
         }
-        it("Getsykmeldt should return aktiv = true") {
+        test("Getsykmeldt should return aktiv = true") {
             every { database.getArbeidsgiverSykmeldinger(any(), any()) } returns listOf(
                 SykmeldingArbeidsgiver(
                     "lederId",

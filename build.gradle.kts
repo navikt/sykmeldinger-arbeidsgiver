@@ -5,33 +5,35 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val coroutinesVersion = "1.6.0"
-val jacksonVersion = "2.13.1"
+val coroutinesVersion = "1.6.1"
+val jacksonVersion = "2.13.2"
+val jacksonPatchVersion = "2.13.2.2"
+val jacksonBomVersion = "2.13.2.20220328"
 val kluentVersion = "1.68"
-val ktorVersion = "1.6.7"
-val logbackVersion = "1.2.10"
-val logstashEncoderVersion = "7.0.1"
-val prometheusVersion = "0.14.1"
-val spekVersion = "2.0.17"
-val smCommonVersion = "1.a92720c"
-val mockkVersion = "1.12.2"
-val nimbusdsVersion = "9.18"
+val ktorVersion = "2.0.0"
+val logbackVersion = "1.2.11"
+val logstashEncoderVersion = "7.1.1"
+val prometheusVersion = "0.15.0"
+val kotestVersion = "5.2.3"
+val smCommonVersion = "1.c55f4d2"
+val mockkVersion = "1.12.3"
+val nimbusdsVersion = "9.22"
 val hikariVersion = "5.0.1"
-val flywayVersion = "8.4.3"
-val postgresVersion = "42.3.2"
-val testContainerVersion = "1.16.3"
-val kotlinVersion = "1.6.0"
-val swaggerUiVersion = "4.1.2"
+val flywayVersion = "8.5.9"
+val postgresVersion = "42.3.4"
+val testContainerVersion = "1.17.1"
+val kotlinVersion = "1.6.20"
+val swaggerUiVersion = "4.10.3"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
 }
 
 plugins {
-    id("org.jmailen.kotlinter") version "3.6.0"
-    kotlin("jvm") version "1.6.0"
-    id("com.diffplug.spotless") version "5.16.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("org.jmailen.kotlinter") version "3.10.0"
+    kotlin("jvm") version "1.6.20"
+    id("com.diffplug.spotless") version "6.5.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.hidetake.swagger.generator") version "2.18.2" apply true
     jacoco
 }
@@ -57,19 +59,24 @@ repositories {
 
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$coroutinesVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
 
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-server-cors:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-id:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
-    implementation("io.ktor:ktor-client-auth-basic:$ktorVersion")
-    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-auth:$ktorVersion")
-    implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
@@ -80,6 +87,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation("com.fasterxml.jackson:jackson-bom:$jacksonBomVersion")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonPatchVersion")
 
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
@@ -89,17 +98,11 @@ dependencies {
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.testcontainers:postgresql:$testContainerVersion")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
-    }
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion") {
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion") {
-        exclude(group = "org.jetbrains.kotlin")
     }
 }
 swaggerSources {
@@ -145,7 +148,6 @@ tasks {
 
     withType<Test> {
         useJUnitPlatform {
-            includeEngines("spek2")
         }
         testLogging.showStandardStreams = true
         dependsOn("generateSwaggerUI")
