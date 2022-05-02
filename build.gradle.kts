@@ -15,7 +15,7 @@ val logbackVersion = "1.2.11"
 val logstashEncoderVersion = "7.1.1"
 val prometheusVersion = "0.15.0"
 val kotestVersion = "5.2.3"
-val smCommonVersion = "1.a92720c"
+val smCommonVersion = "1.c55f4d2"
 val mockkVersion = "1.12.3"
 val nimbusdsVersion = "9.22"
 val hikariVersion = "5.0.1"
@@ -59,7 +59,7 @@ repositories {
 
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$coroutinesVersion")
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
