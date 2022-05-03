@@ -10,6 +10,11 @@ spec:
     outbound:
       rules:
         - application: narmesteleder
+    inbound:
+      rules:
+        - application: debug-dings
+          namespace: plattformsikkerhet
+          cluster: dev-gcp
   gcp:
     sqlInstances:
       - name: sykmeldinger-arbeidsgiver-instance
