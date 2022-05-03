@@ -1,5 +1,6 @@
 package no.nav.syfo
 
+import com.nimbusds.jose.jwk.RSAKey
 import no.nav.syfo.kafka.KafkaConfig
 import no.nav.syfo.kafka.KafkaCredentials
 
@@ -26,7 +27,10 @@ data class Environment(
     val pdlGraphqlPath: String = getEnvVar("PDL_GRAPHQL_PATH"),
     val aadAccessTokenUrl: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     val clientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
-    val clientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET")
+    val clientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
+    val tokenXWellKnownUrl: String = getEnvVar("TOKEN_X_WELL_KNOWN_URL"),
+    val clientIdTokenX: String = getEnvVar("TOKEN_X_CLIENT_ID"),
+    val tokenXPrivateJwk: RSAKey = RSAKey.parse(getEnvVar("TOKEN_X_PRIVATE_JWK"))
 ) : KafkaConfig {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$dbHost:$dbPort/$dbName"

@@ -53,6 +53,8 @@ spec:
   webproxy: true
   kafka:
     pool: nav-dev
+  tokenx:
+    enabled: true
   azure:
     application:
       enabled: true

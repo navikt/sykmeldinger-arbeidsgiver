@@ -15,6 +15,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
@@ -49,12 +50,16 @@ class DineSykmeldteApiKtTest : FunSpec({
             application.setupAuth(
                 env = env,
                 jwkProviderLoginservice = jwkProvider,
-                loginserviceIssuer = "iss"
+                loginserviceIssuer = "iss",
+                jwkProviderTokenX = jwkProvider,
+                tokenXIssuer = "tokendings"
             )
 
             application.routing {
-                authenticate {
-                    registerDineSykmeldteApi(dineSykmeldteService)
+                authenticate("loginservice") {
+                    route("/api") {
+                        registerDineSykmeldteApi(dineSykmeldteService)
+                    }
                 }
             }
 
