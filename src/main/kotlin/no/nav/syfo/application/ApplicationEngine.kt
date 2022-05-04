@@ -21,6 +21,7 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.syfo.Environment
 import no.nav.syfo.application.api.registerNaisApi
@@ -36,7 +37,9 @@ fun createApplicationEngine(
     applicationState: ApplicationState,
     dineSykmeldteService: DineSykmeldteService,
     jwkProvider: JwkProvider,
-    loginserviceIssuer: String
+    loginserviceIssuer: String,
+    jwkProviderTokenX: JwkProvider,
+    tokenXIssuer: String
 ): ApplicationEngine =
     embeddedServer(Netty, env.applicationPort) {
         install(ContentNegotiation) {
@@ -49,7 +52,13 @@ fun createApplicationEngine(
             }
         }
 
-        setupAuth(jwkProviderLoginservice = jwkProvider, env = env, loginserviceIssuer = loginserviceIssuer)
+        setupAuth(
+            jwkProviderLoginservice = jwkProvider,
+            env = env,
+            loginserviceIssuer = loginserviceIssuer,
+            jwkProviderTokenX = jwkProviderTokenX,
+            tokenXIssuer = tokenXIssuer
+        )
         install(CORS) {
             allowMethod(HttpMethod.Get)
             allowMethod(HttpMethod.Options)
@@ -77,8 +86,15 @@ fun createApplicationEngine(
             if (env.cluster == "dev-gcp") {
                 setupSwaggerDocApi()
             }
-            authenticate {
-                registerDineSykmeldteApi(dineSykmeldteService)
+            authenticate("loginservice") {
+                route("/api") {
+                    registerDineSykmeldteApi(dineSykmeldteService)
+                }
+            }
+            authenticate("tokenx") {
+                route("/api/v2") {
+                    registerDineSykmeldteApi(dineSykmeldteService)
+                }
             }
         }
         intercept(ApplicationCallPipeline.Monitoring, monitorHttpRequests())

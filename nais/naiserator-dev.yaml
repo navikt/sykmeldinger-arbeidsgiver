@@ -10,6 +10,11 @@ spec:
     outbound:
       rules:
         - application: narmesteleder
+    inbound:
+      rules:
+        - application: debug-dings
+          namespace: plattformsikkerhet
+          cluster: dev-gcp
   gcp:
     sqlInstances:
       - name: sykmeldinger-arbeidsgiver-instance
@@ -53,6 +58,8 @@ spec:
   webproxy: true
   kafka:
     pool: nav-dev
+  tokenx:
+    enabled: true
   azure:
     application:
       enabled: true
@@ -61,8 +68,6 @@ spec:
     - secret: sykmeldinger-arbeidsgiver-secrets
     - configmap: loginservice-idporten
   env:
-    - name: KAFKA_BOOTSTRAP_SERVERS_URL
-      value: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
     - name: NARMESTELEDER_URL
       value: https://narmesteleder.dev.nav.no
     - name: ALLOWED_ORIGIN

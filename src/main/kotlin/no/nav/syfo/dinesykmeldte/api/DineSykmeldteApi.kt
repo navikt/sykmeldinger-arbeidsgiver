@@ -11,7 +11,7 @@ import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
 
 fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
-    get("api/dinesykmeldte") {
+    get("/dinesykmeldte") {
         val principal: BrukerPrincipal = call.authentication.principal()!!
         val fnr = principal.fnr
         val sykmeldte = dineSykmeldteService.getDineSykmeldte(fnr)
@@ -19,7 +19,7 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
         call.respond(sykmeldte)
     }
 
-    get("api/dinesykmeldte/{narmestelederId}") {
+    get("/dinesykmeldte/{narmestelederId}") {
         val narmestelederId = call.parameters["narmestelederId"]!!
         val principal: BrukerPrincipal = call.authentication.principal()!!
         val fnr = principal.fnr

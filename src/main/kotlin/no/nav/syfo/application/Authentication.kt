@@ -15,9 +15,15 @@ import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.Environment
 import no.nav.syfo.log
 
-fun Application.setupAuth(jwkProviderLoginservice: JwkProvider, env: Environment, loginserviceIssuer: String) {
+fun Application.setupAuth(
+    jwkProviderLoginservice: JwkProvider,
+    env: Environment,
+    loginserviceIssuer: String,
+    jwkProviderTokenX: JwkProvider,
+    tokenXIssuer: String
+) {
     install(Authentication) {
-        jwt {
+        jwt(name = "loginservice") {
             authHeader {
                 if (it.getToken() == null) {
                     return@authHeader null
@@ -34,6 +40,28 @@ fun Application.setupAuth(jwkProviderLoginservice: JwkProvider, env: Environment
                             principal = principal
                         )
                     }
+                    else -> unauthorized(credentials)
+                }
+            }
+        }
+        jwt(name = "tokenx") {
+            authHeader {
+                if (it.getToken() == null) {
+                    return@authHeader null
+                }
+                return@authHeader HttpAuthHeader.Single("Bearer", it.getToken()!!)
+            }
+            verifier(jwkProviderTokenX, tokenXIssuer)
+            validate { credentials ->
+                when {
+                    hasClientIdAudience(credentials, env.clientIdTokenX) && erNiva4(credentials) ->
+                        {
+                            val principal = JWTPrincipal(credentials.payload)
+                            BrukerPrincipal(
+                                fnr = finnFnrFraToken(principal),
+                                principal = principal
+                            )
+                        }
                     else -> unauthorized(credentials)
                 }
             }
@@ -58,6 +86,10 @@ fun unauthorized(credentials: JWTCredential): Principal? {
 
 fun hasLoginserviceIdportenClientIdAudience(credentials: JWTCredential, loginserviceIdportenClientId: List<String>): Boolean {
     return loginserviceIdportenClientId.any { credentials.payload.audience.contains(it) }
+}
+
+fun hasClientIdAudience(credentials: JWTCredential, clientId: String): Boolean {
+    return credentials.payload.audience.contains(clientId)
 }
 
 fun erNiva4(credentials: JWTCredential): Boolean {
