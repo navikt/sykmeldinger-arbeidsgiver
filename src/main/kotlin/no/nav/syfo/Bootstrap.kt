@@ -100,7 +100,6 @@ fun main() {
         tokenXIssuer = wellKnownTokenX.issuer
     )
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
-    applicationServer.start()
 
     val aivenKafkaConsumer = KafkaConsumer(
         KafkaUtils.getAivenKafkaConfig().also {
@@ -117,8 +116,6 @@ fun main() {
         env.narmestelederLeesahTopic,
         applicationState
     )
-
-    applicationState.ready = true
 
     narmestelederConsumer.startConsumer()
 
@@ -144,6 +141,7 @@ fun main() {
     ).startConsumer()
 
     DeleteSykmeldingService(database, applicationState).start()
+    applicationServer.start()
 }
 
 fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) =
