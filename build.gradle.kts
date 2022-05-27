@@ -20,7 +20,7 @@ val hikariVersion = "5.0.1"
 val flywayVersion = "8.5.9"
 val postgresVersion = "42.3.4"
 val testContainerVersion = "1.17.1"
-val kotlinVersion = "1.6.20"
+val kotlinVersion = "1.6.21"
 val swaggerUiVersion = "4.10.3"
 
 tasks.withType<Jar> {
