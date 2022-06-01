@@ -10,6 +10,11 @@ spec:
     outbound:
       rules:
         - application: narmesteleder
+    inbound:
+      rules:
+        - application: dialogmote-frontend
+          namespace: team-esyfo
+          cluster: prod-gcp
   image: {{ image }}
   gcp:
     sqlInstances:
