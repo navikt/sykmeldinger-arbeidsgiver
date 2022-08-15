@@ -5,22 +5,22 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val coroutinesVersion = "1.6.1"
+val coroutinesVersion = "1.6.4"
 val jacksonVersion = "2.13.3"
 val kluentVersion = "1.68"
-val ktorVersion = "2.0.1"
+val ktorVersion = "2.1.0"
 val logbackVersion = "1.2.11"
-val logstashEncoderVersion = "7.1.1"
+val logstashEncoderVersion = "7.2"
 val prometheusVersion = "0.15.0"
-val kotestVersion = "5.2.3"
+val kotestVersion = "5.4.1"
 val smCommonVersion = "1.f132f2b"
 val mockkVersion = "1.12.3"
 val nimbusdsVersion = "9.22"
 val hikariVersion = "5.0.1"
 val flywayVersion = "8.5.9"
-val postgresVersion = "42.3.4"
-val testContainerVersion = "1.17.1"
-val kotlinVersion = "1.6.21"
+val postgresVersion = "42.4.1"
+val testContainerVersion = "1.17.3"
+val kotlinVersion = "1.7.10"
 val swaggerUiVersion = "4.10.3"
 
 tasks.withType<Jar> {
@@ -29,7 +29,7 @@ tasks.withType<Jar> {
 
 plugins {
     id("org.jmailen.kotlinter") version "3.10.0"
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.10"
     id("com.diffplug.spotless") version "6.5.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.hidetake.swagger.generator") version "2.18.2" apply true
@@ -78,7 +78,7 @@ dependencies {
 
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
-    swaggerUI( "org.webjars:swagger-ui:$swaggerUiVersion")
+    swaggerUI("org.webjars:swagger-ui:$swaggerUiVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
@@ -109,8 +109,8 @@ swaggerSources {
 }
 tasks.jacocoTestReport {
     reports {
-        xml.isEnabled = true
-        html.isEnabled = true
+        xml.required.set(true)
+        html.required.set(true)
     }
 }
 
