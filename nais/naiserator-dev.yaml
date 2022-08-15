@@ -15,6 +15,9 @@ spec:
         - application: debug-dings
           namespace: plattformsikkerhet
           cluster: dev-gcp
+        - application: dialogmote-frontend
+          namespace: team-esyfo
+          cluster: dev-gcp
   gcp:
     sqlInstances:
       - name: sykmeldinger-arbeidsgiver-instance
