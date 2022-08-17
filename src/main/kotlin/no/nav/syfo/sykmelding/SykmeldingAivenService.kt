@@ -64,7 +64,7 @@ class SykmeldingAivenService(
     }
 
     private fun logProcessedMessages(processedMessages: Int): Int {
-        var currentLogTime = Instant.now().toEpochMilli()
+        val currentLogTime = Instant.now().toEpochMilli()
         if (processedMessages > 0 && currentLogTime - lastLogTime > logTimer) {
             log.info("Processed $processedMessages messages, ignored sykmeldinger $ignoredSykmeldinger")
             lastLogTime = currentLogTime

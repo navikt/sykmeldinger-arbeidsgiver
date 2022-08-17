@@ -2,7 +2,7 @@ name: Deploy to dev
 on:
   push:
     branches:
-      - '*'
+      - '**'
       - '!main'
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/sykmeldinger-arbeidsgiver:${{ github.sha }}
