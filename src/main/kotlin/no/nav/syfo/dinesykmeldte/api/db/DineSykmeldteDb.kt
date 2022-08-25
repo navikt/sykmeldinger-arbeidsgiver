@@ -19,7 +19,7 @@ fun DatabaseInterface.insertOrUpdateReadStatus(
         ON CONFLICT (narmesteleder_id) DO UPDATE
             SET narmesteleder_id = ?,
                 read_status      = ?
-        """.trimIndent()
+            """.trimIndent()
         ).use { ps ->
             val narmestelederId = dineSykmeldteLestStatusKafkaMessage.nlReadCount.narmestelederId
             val readCount = toPGObject(dineSykmeldteLestStatusKafkaMessage.nlReadCount)
@@ -42,10 +42,10 @@ fun DatabaseInterface.insertOrUpdateReadStatus(
 fun DatabaseInterface.deleteReadStatus(narmestelederId: String) {
     connection.use { connection ->
         connection.prepareStatement(
-        """
+            """
         DELETE FROM narmesteleder_read_status
         WHERE narmesteleder_id = ?
-        """.trimIndent()
+            """.trimIndent()
         ).use { ps ->
             ps.setString(1, narmestelederId)
             ps.execute()
@@ -61,7 +61,7 @@ fun DatabaseInterface.getReadStatusForNarmesteleder(narmestelederId: String): NL
         SELECT read_status
         FROM narmesteleder_read_status
         WHERE narmesteleder_id = ?
-        """.trimIndent()
+            """.trimIndent()
         ).use { ps ->
             ps.setString(1, narmestelederId)
             ps.executeQuery().toReadCount()
@@ -69,7 +69,7 @@ fun DatabaseInterface.getReadStatusForNarmesteleder(narmestelederId: String): NL
     }
 
 private fun ResultSet.toReadCount(): NLReadCount? {
-    return when(next()) {
+    return when (next()) {
         false -> null
         else -> objectMapper.readValue(getString("read_status"))
     }

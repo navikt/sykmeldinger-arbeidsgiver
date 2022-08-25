@@ -16,15 +16,17 @@ class DineSykmeldteServiceTest : FunSpec({
 
     context("Get sykmeldinger") {
         test("Should get SykmeldingerArbeidsgiverV2") {
-            every { sykmeldingService.getSykmeldinger("123") } returns listOf(SykmeldingArbeidsgiver(
-                "lederFnr",
-                "Fornavn Etternavn",
-                "pasientFnr",
-                "orgnummer",
-                "Orgnavn",
-                getArbeidsgiverSykmelding(sykmeldingsId = "123"),
-                null,
-            ))
+            every { sykmeldingService.getSykmeldinger("123") } returns listOf(
+                SykmeldingArbeidsgiver(
+                    "lederFnr",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
+                    getArbeidsgiverSykmelding(sykmeldingsId = "123"),
+                    null,
+                )
+            )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
             sykmeldte.size shouldBeEqualTo 1
             sykmeldte.first().aktivSykmelding shouldBeEqualTo true

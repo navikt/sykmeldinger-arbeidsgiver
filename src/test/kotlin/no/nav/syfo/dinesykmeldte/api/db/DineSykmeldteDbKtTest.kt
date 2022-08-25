@@ -24,8 +24,8 @@ class DineSykmeldteDbKtTest : FunSpec({
         .withDatabaseName("database")
         .withInitScript("db/testdb-init.sql")
         .apply {
-            start();
-            println("Database: jdbc:postgresql://localhost:${firstMappedPort}/database startet opp, credentials: username og password")
+            start()
+            println("Database: jdbc:postgresql://localhost:$firstMappedPort/database startet opp, credentials: username og password")
         }
 
     every { mockEnv.jdbcUrl() } returns psqlContainer.jdbcUrl
@@ -38,7 +38,7 @@ class DineSykmeldteDbKtTest : FunSpec({
                 narmestelederId = "test-1"
             )
 
-            database.insertOrUpdateReadStatus(readStatusKafkaMessage);
+            database.insertOrUpdateReadStatus(readStatusKafkaMessage)
 
             val readStatus = database.getReadStatusForNarmesteleder("test-1")
 
@@ -54,11 +54,11 @@ class DineSykmeldteDbKtTest : FunSpec({
             val readStatusKafkaMessage = createDineSykmeldteLestStatusKafkaMessage(
                 narmestelederId = "test-1"
             )
-            database.insertOrUpdateReadStatus(readStatusKafkaMessage);
+            database.insertOrUpdateReadStatus(readStatusKafkaMessage)
             val readStatus = database.getReadStatusForNarmesteleder("test-1")
             readStatus?.narmestelederId shouldBe "test-1"
 
-            database.deleteReadStatus("test-1");
+            database.deleteReadStatus("test-1")
 
             val deletedReadStatus = database.getReadStatusForNarmesteleder("test-1")
             deletedReadStatus?.narmestelederId.shouldBeNull()
