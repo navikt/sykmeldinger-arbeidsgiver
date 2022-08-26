@@ -43,9 +43,9 @@ class SykmeldingAivenService(
                     kafkaConsumer.subscribe(listOf(topic))
                     start()
                 } catch (ex: Exception) {
-                    log.error("Error running kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
+                    log.error("Error running sykmelding kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
                     kafkaConsumer.unsubscribe()
-                    delay(10_000)
+                    delay(5_000)
                 }
             }
         }
@@ -64,7 +64,7 @@ class SykmeldingAivenService(
     }
 
     private fun logProcessedMessages(processedMessages: Int): Int {
-        var currentLogTime = Instant.now().toEpochMilli()
+        val currentLogTime = Instant.now().toEpochMilli()
         if (processedMessages > 0 && currentLogTime - lastLogTime > logTimer) {
             log.info("Processed $processedMessages messages, ignored sykmeldinger $ignoredSykmeldinger")
             lastLogTime = currentLogTime

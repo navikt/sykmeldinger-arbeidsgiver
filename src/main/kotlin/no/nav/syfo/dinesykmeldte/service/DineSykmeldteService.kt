@@ -14,7 +14,8 @@ class DineSykmeldteService(
     }
 
     fun getDineSykmeldte(fnrLeder: String): List<Sykmeldt> {
-        return sykmeldingService.getSykmeldinger(fnrLeder).groupBy {
+        val sykmeldinger = sykmeldingService.getSykmeldinger(fnrLeder)
+        return sykmeldinger.groupBy {
             Ansatt(
                 fnr = it.pasientFnr,
                 navn = it.navn,
@@ -28,7 +29,8 @@ class DineSykmeldteService(
                 fnr = ansatt.key.fnr,
                 ansatt.key.navn,
                 sykmeldinger = ansatt.value.map { it.toDineSykmeldteSykmelding(ansatt.key) },
-                aktivSykmelding = ansatt.value.any { it.sykmelding.sykmeldingsperioder.isActive() }
+                aktivSykmelding = ansatt.value.any { it.sykmelding.sykmeldingsperioder.isActive() },
+                lestStatus = ansatt.value.first().lestStatus,
             )
         }
     }

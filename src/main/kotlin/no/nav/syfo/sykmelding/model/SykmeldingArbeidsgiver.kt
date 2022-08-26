@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding.model
 
+import no.nav.syfo.dinesykmeldte.kafka.model.NLReadCount
 import no.nav.syfo.model.sykmelding.arbeidsgiver.ArbeidsgiverSykmelding
 
 data class SykmeldingArbeidsgiver(
@@ -8,5 +9,6 @@ data class SykmeldingArbeidsgiver(
     val pasientFnr: String,
     val orgnummer: String,
     val orgNavn: String,
-    val sykmelding: ArbeidsgiverSykmelding
+    val sykmelding: ArbeidsgiverSykmelding,
+    val lestStatus: NLReadCount?,
 )

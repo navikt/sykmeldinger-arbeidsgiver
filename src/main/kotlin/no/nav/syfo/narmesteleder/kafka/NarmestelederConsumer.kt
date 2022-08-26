@@ -32,9 +32,9 @@ class NarmestelederConsumer(
                 try {
                     start()
                 } catch (ex: Exception) {
-                    log.error("Error running kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
+                    log.error("Error running narmesteleder kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
                     kafkaConsumer.unsubscribe()
-                    delay(10_000)
+                    delay(5_000)
                 }
             }
         }

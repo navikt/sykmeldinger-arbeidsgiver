@@ -1,6 +1,7 @@
 package no.nav.syfo.sykmelding
 
 import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.dinesykmeldte.api.db.getReadStatusForNarmesteleder
 import no.nav.syfo.dinesykmeldte.model.Sykmeldt
 import no.nav.syfo.dinesykmeldte.util.isActive
 import no.nav.syfo.sykmelding.db.getArbeidsgiverSykmeldinger
@@ -17,9 +18,8 @@ class SykmeldingService(val database: DatabaseInterface) {
     fun getSykmeldt(narmestelederId: String, lederFnr: String): Sykmeldt? {
         val arbeidsgiverSykmeldinger =
             database.getArbeidsgiverSykmeldinger(lederFnr = lederFnr, narmestelederId = narmestelederId)
-
-        val sykmeldingArbeidsgiverV2 =
-            arbeidsgiverSykmeldinger.firstOrNull()
+        val lestStatus = database.getReadStatusForNarmesteleder(narmestelederId = narmestelederId)
+        val sykmeldingArbeidsgiverV2 = arbeidsgiverSykmeldinger.firstOrNull()
 
         return if (sykmeldingArbeidsgiverV2 != null) {
             Sykmeldt(
@@ -28,7 +28,8 @@ class SykmeldingService(val database: DatabaseInterface) {
                 fnr = sykmeldingArbeidsgiverV2.pasientFnr,
                 navn = sykmeldingArbeidsgiverV2.navn,
                 sykmeldinger = null,
-                aktivSykmelding = arbeidsgiverSykmeldinger.any { it.sykmelding.sykmeldingsperioder.isActive() }
+                aktivSykmelding = arbeidsgiverSykmeldinger.any { it.sykmelding.sykmeldingsperioder.isActive() },
+                lestStatus = lestStatus,
             )
         } else null
     }

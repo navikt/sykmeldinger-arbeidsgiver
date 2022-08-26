@@ -1,5 +1,6 @@
 package no.nav.syfo
 
+import DineSykmeldteLestStatusService
 import com.auth0.jwk.JwkProviderBuilder
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -25,6 +26,7 @@ import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.application.database.Database
 import no.nav.syfo.application.exception.ServiceUnavailableException
 import no.nav.syfo.azuread.AccessTokenClient
+import no.nav.syfo.dinesykmeldte.kafka.model.DineSykmeldteLestStatusKafkaMessage
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.toConsumerConfig
@@ -138,6 +140,22 @@ fun main() {
 
     SykmeldingAivenService(
         aivenKafkaSykmeldingConsumer, database, applicationState, env.syfoSendtSykmeldingTopicAiven, pdlPersonService, env.cluster
+    ).startConsumer()
+
+    val aivenKafkaLestStatusConsumer = KafkaConsumer(
+        KafkaUtils.getAivenKafkaConfig().also {
+            it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+        }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
+        StringDeserializer(),
+        JacksonKafkaDeserializer(DineSykmeldteLestStatusKafkaMessage::class)
+    )
+
+    DineSykmeldteLestStatusService(
+        aivenKafkaLestStatusConsumer,
+        database,
+        applicationState,
+        env.dineSykmeldteLestStatusTopicAiven
     ).startConsumer()
 
     DeleteSykmeldingService(database, applicationState).start()

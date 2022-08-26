@@ -8,17 +8,12 @@ import no.nav.syfo.pdl.model.toFormattedNameString
 import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import no.nav.syfo.util.objectMapper
-import org.postgresql.util.PGobject
+import no.nav.syfo.util.toPGObject
 import java.sql.Connection
 import java.sql.Date
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDate
-
-private fun toPGObject(obj: Any) = PGobject().also {
-    it.type = "json"
-    it.value = objectMapper.writeValueAsString(obj)
-}
 
 private fun insertOrUpdateSykmeldt(
     connection: Connection,
@@ -164,9 +159,10 @@ private fun insertOrUpdateArbeidsgiverSykmelding(
 fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiver> {
     return connection.use { connection ->
         connection.prepareStatement(
-            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
+            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, nrs.read_status, sa.orgnavn from narmesteleder as nl
                         inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
                         inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
+                        left join narmesteleder_read_status as nrs on nrs.narmesteleder_id = nl.narmeste_leder_id
                     where nl.leder_fnr = ?;
                 """
         ).use { ps ->
@@ -179,9 +175,10 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<Sykmel
 fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelederId: String): List<SykmeldingArbeidsgiver> {
     return connection.use { connection ->
         connection.prepareStatement(
-            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
+            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, nrs.read_status, sa.orgnavn from narmesteleder as nl
                     inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
                     inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
+                    left join narmesteleder_read_status as nrs on nrs.narmesteleder_id = nl.narmeste_leder_id
                     where nl.leder_fnr = ?
                        and nl.narmeste_leder_id = ?;
                 """
@@ -217,13 +214,15 @@ private fun deleteSykmeldinger(connection: Connection, date: LocalDate): Int {
 }
 
 fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiver {
+    val readStatus = getString("read_status")
     return SykmeldingArbeidsgiver(
         narmestelederId = getString("narmeste_leder_id"),
         pasientFnr = getString("pasient_fnr"),
         orgnummer = getString("orgnummer"),
         orgNavn = getString("orgnavn") ?: "",
         navn = getString("pasient_navn"),
-        sykmelding = objectMapper.readValue(getString("sykmelding"))
+        sykmelding = objectMapper.readValue(getString("sykmelding")),
+        lestStatus = if (readStatus != null) objectMapper.readValue(readStatus) else null,
     )
 }
 

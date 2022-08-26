@@ -12,6 +12,7 @@ data class Environment(
     val dbName: String = getEnvVar("NAIS_DATABASE_DATABASE"),
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val syfoSendtSykmeldingTopicAiven: String = "teamsykmelding.syfo-sendt-sykmelding",
+    val dineSykmeldteLestStatusTopicAiven: String = "teamsykmelding.dinesykmeldte-lest-status",
     val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
     val loginserviceIdportenAudience: List<String> = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
     val allowedOrigin: List<String> = getEnvVar("ALLOWED_ORIGIN").split(","),
