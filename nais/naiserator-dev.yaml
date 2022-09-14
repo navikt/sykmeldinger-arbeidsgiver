@@ -71,8 +71,6 @@ spec:
     - secret: sykmeldinger-arbeidsgiver-secrets
     - configmap: loginservice-idporten
   env:
-    - name: NARMESTELEDER_URL
-      value: https://narmesteleder.dev.nav.no
     - name: ALLOWED_ORIGIN
       value: tjenester-q1.nav.no,www-gcp.dev.nav.no,sykmeldinger-arbeidsgiver.dev.nav.no
     - name: PDL_GRAPHQL_PATH
