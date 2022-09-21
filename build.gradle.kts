@@ -13,15 +13,15 @@ val logbackVersion = "1.4.0"
 val logstashEncoderVersion = "7.2"
 val prometheusVersion = "0.16.0"
 val kotestVersion = "5.4.2"
-val smCommonVersion = "1.f132f2b"
+val smCommonVersion = "1.069b5f9"
 val mockkVersion = "1.12.7"
-val nimbusdsVersion = "9.24.2"
+val nimbusdsVersion = "9.24.4"
 val hikariVersion = "5.0.1"
-val flywayVersion = "9.1.6"
-val postgresVersion = "42.4.2"
+val flywayVersion = "9.3.0"
+val postgresVersion = "42.5.0"
 val testContainerVersion = "1.17.3"
 val kotlinVersion = "1.7.10"
-val swaggerUiVersion = "4.13.2"
+val swaggerUiVersion = "4.14.0"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
@@ -32,7 +32,7 @@ plugins {
     kotlin("jvm") version "1.7.10"
     id("com.diffplug.spotless") version "6.5.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("org.hidetake.swagger.generator") version "2.18.2" apply true
+    id("org.hidetake.swagger.generator") version "2.19.2" apply true
     jacoco
 }
 
