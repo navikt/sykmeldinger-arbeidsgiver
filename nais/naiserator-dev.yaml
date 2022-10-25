@@ -58,7 +58,7 @@ spec:
   ingresses:
     - "https://sykmeldinger-arbeidsgiver.dev.intern.nav.no"
     - "https://sykmeldinger-arbeidsgiver.dev.nav.no"
-  webproxy: true
+  webproxy: false
   kafka:
     pool: nav-dev
   tokenx:
@@ -67,6 +67,7 @@ spec:
     application:
       enabled: true
       tenant: trygdeetaten.no
+  leaderElection: true
   envFrom:
     - secret: sykmeldinger-arbeidsgiver-secrets
     - configmap: loginservice-idporten

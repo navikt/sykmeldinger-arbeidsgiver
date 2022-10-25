@@ -10,8 +10,8 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.engine.cio.CIOEngineConfig
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache.ApacheEngineConfig
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -26,6 +26,7 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.application.database.Database
 import no.nav.syfo.application.exception.ServiceUnavailableException
+import no.nav.syfo.application.leaderelection.LeaderElection
 import no.nav.syfo.azuread.AccessTokenClient
 import no.nav.syfo.dinesykmeldte.kafka.model.DineSykmeldteLestStatusKafkaMessage
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
@@ -58,7 +59,7 @@ fun main() {
     val applicationState = ApplicationState()
     val database = Database(env)
 
-    val config: HttpClientConfig<CIOEngineConfig>.() -> Unit = {
+    val config: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
         install(ContentNegotiation) {
             jackson {
                 registerKotlinModule()
@@ -90,7 +91,7 @@ fun main() {
             }
         }
     }
-    val httpClient = HttpClient(CIO, config)
+    val httpClient = HttpClient(Apache, config)
 
     val wellKnown = getWellKnown(httpClient, env.loginserviceIdportenDiscoveryUrl)
     val jwkProviderLoginservice = JwkProviderBuilder(URL(wellKnown.jwks_uri))
@@ -174,7 +175,8 @@ fun main() {
         env.dineSykmeldteLestStatusTopicAiven
     ).startConsumer()
 
-    DeleteSykmeldingService(database, applicationState).start()
+    val leaderElection = LeaderElection(httpClient, env.electorPath)
+    DeleteSykmeldingService(database, leaderElection, applicationState).start()
     applicationServer.start()
 }
 
