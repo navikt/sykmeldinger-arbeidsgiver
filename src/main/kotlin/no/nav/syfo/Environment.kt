@@ -25,7 +25,8 @@ data class Environment(
     val clientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val tokenXWellKnownUrl: String = getEnvVar("TOKEN_X_WELL_KNOWN_URL"),
     val clientIdTokenX: String = getEnvVar("TOKEN_X_CLIENT_ID"),
-    val tokenXPrivateJwk: RSAKey = RSAKey.parse(getEnvVar("TOKEN_X_PRIVATE_JWK"))
+    val tokenXPrivateJwk: RSAKey = RSAKey.parse(getEnvVar("TOKEN_X_PRIVATE_JWK")),
+    val electorPath: String = getEnvVar("ELECTOR_PATH")
 ) {
     fun jdbcUrl(): String {
         return "jdbc:postgresql://$dbHost:$dbPort/$dbName"
