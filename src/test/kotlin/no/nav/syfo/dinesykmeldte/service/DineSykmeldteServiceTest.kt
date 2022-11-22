@@ -24,7 +24,6 @@ class DineSykmeldteServiceTest : FunSpec({
                     "orgnummer",
                     "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123"),
-                    null,
                 )
             )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
@@ -37,7 +36,6 @@ class DineSykmeldteServiceTest : FunSpec({
                 SykmeldingArbeidsgiver(
                     "lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123", fom = LocalDate.of(2020, 1, 1), tom = LocalDate.of(2020, 1, 7)),
-                    null,
                 )
             )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
@@ -50,12 +48,10 @@ class DineSykmeldteServiceTest : FunSpec({
                 SykmeldingArbeidsgiver(
                     "lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123"),
-                    null,
                 ),
                 SykmeldingArbeidsgiver(
                     "lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123", fom = LocalDate.of(2020, 1, 1), tom = LocalDate.of(2020, 1, 7)),
-                    null,
                 )
             )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
