@@ -28,7 +28,6 @@ class SykmeldingServiceTest : FunSpec({
             narmestelederId = "lederId",
             aktivSykmelding = true,
             sykmeldinger = null,
-            lestStatus = null,
         )
         val inaktivAnsatt = Sykmeldt(
             fnr = "pasientFnr",
@@ -37,7 +36,6 @@ class SykmeldingServiceTest : FunSpec({
             narmestelederId = "lederId",
             aktivSykmelding = false,
             sykmeldinger = null,
-            lestStatus = null,
         )
 
         test("getSykmeldt returnerer ansatt med aktivSykmelding = false") {
@@ -53,7 +51,6 @@ class SykmeldingServiceTest : FunSpec({
                         fom = LocalDate.of(2021, 10, 1),
                         tom = LocalDate.of(2021, 10, 9)
                     ),
-                    lestStatus = null,
                 )
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo inaktivAnsatt
@@ -72,7 +69,6 @@ class SykmeldingServiceTest : FunSpec({
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1)
                     ),
-                    null,
                 )
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo ansatt
@@ -89,7 +85,6 @@ class SykmeldingServiceTest : FunSpec({
                         fom = LocalDate.now().minusDays(10),
                         tom = LocalDate.now().minusDays(8)
                     ),
-                    null,
                 ),
                 SykmeldingArbeidsgiver(
                     "lederId",
@@ -101,7 +96,6 @@ class SykmeldingServiceTest : FunSpec({
                         fom = LocalDate.now().minusDays(7),
                         tom = LocalDate.now().plusDays(8)
                     ),
-                    null,
                 ),
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr")?.aktivSykmelding shouldBeEqualTo true

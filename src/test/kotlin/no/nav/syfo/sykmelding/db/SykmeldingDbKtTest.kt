@@ -6,8 +6,6 @@ import io.mockk.mockk
 import no.nav.syfo.Environment
 import no.nav.syfo.application.database.Database
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.dinesykmeldte.api.db.insertOrUpdateReadStatus
-import no.nav.syfo.dinesykmeldte.service.createDineSykmeldteLestStatusKafkaMessage
 import no.nav.syfo.model.sykmelding.arbeidsgiver.ArbeidsgiverAGDTO
 import no.nav.syfo.model.sykmelding.arbeidsgiver.ArbeidsgiverSykmelding
 import no.nav.syfo.model.sykmelding.arbeidsgiver.BehandlerAGDTO
@@ -165,13 +163,10 @@ class SykmeldingDbKtTest : FunSpec({
             )
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
-            database.insertOrUpdateReadStatus(createDineSykmeldteLestStatusKafkaMessage(narmestelederId = nl.narmesteLederId.toString()))
             narmestelederDb.insertOrUpdate(nl)
 
             val arbeidsgiverSykmeldinger = database.getArbeidsgiverSykmeldinger("lederFnr")
             arbeidsgiverSykmeldinger.size shouldBeEqualTo 1
-            arbeidsgiverSykmeldinger.first().lestStatus?.narmestelederId shouldBeEqualTo nl.narmesteLederId.toString()
-            arbeidsgiverSykmeldinger.first().lestStatus?.unreadSykmeldinger shouldBeEqualTo 1
         }
 
         test("Get ArbeidsgiverSykmeldinger from leder fnr and narmeste leder id") {

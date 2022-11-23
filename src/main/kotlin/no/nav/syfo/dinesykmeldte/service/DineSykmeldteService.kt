@@ -30,7 +30,6 @@ class DineSykmeldteService(
                 ansatt.key.navn,
                 sykmeldinger = ansatt.value.map { it.toDineSykmeldteSykmelding(ansatt.key) },
                 aktivSykmelding = ansatt.value.any { it.sykmelding.sykmeldingsperioder.isActive() },
-                lestStatus = ansatt.value.first().lestStatus,
             )
         }
     }

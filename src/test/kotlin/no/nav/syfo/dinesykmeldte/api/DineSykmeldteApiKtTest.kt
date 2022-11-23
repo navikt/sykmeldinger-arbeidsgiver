@@ -88,7 +88,6 @@ class DineSykmeldteApiKtTest : FunSpec({
                             "Navn Navnesen",
                             null,
                             aktivSykmelding = true,
-                            lestStatus = null,
                         )
                     )
                 with(
@@ -109,7 +108,6 @@ class DineSykmeldteApiKtTest : FunSpec({
                             "Navn Navnesen",
                             null,
                             aktivSykmelding = true,
-                            lestStatus = null,
                         )
                     )
                 }
@@ -124,7 +122,6 @@ class DineSykmeldteApiKtTest : FunSpec({
                         "Navn Navnesen",
                         null,
                         aktivSykmelding = true,
-                        lestStatus = null,
                     )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
@@ -143,7 +140,6 @@ class DineSykmeldteApiKtTest : FunSpec({
                         "Navn Navnesen",
                         null,
                         aktivSykmelding = true,
-                        lestStatus = null,
                     )
                 }
             }
