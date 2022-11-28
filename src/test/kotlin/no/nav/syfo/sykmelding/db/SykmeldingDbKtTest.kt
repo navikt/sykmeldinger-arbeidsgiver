@@ -253,6 +253,7 @@ fun getArbeidsgiverSykmelding(fom: LocalDate = LocalDate.now(), tom: LocalDate =
         egenmeldt = false,
         papirsykmelding = false,
         harRedusertArbeidsgiverperiode = false,
-        merknader = emptyList()
+        merknader = emptyList(),
+        utenlandskSykmelding = null
     )
 }
