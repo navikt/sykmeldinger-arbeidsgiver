@@ -32,9 +32,9 @@ fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
             tilretteleggingArbeidsplass = this.sykmelding.tiltakArbeidsplassen
         ),
         bekreftelse = Bekreftelse(
-            sykmelder = getSykmelderNavn(this.sykmelding.behandler),
+            sykmelder = this.sykmelding.behandler?.let { getSykmelderNavn(it) } ?: "",
             utstedelsesdato = this.sykmelding.behandletTidspunkt.toLocalDate(),
-            sykmelderTlf = this.sykmelding.behandler.tlf
+            sykmelderTlf = this.sykmelding.behandler?.tlf
         ),
         friskmelding = Friskmelding(
             arbeidsfoerEtterPerioden = this.sykmelding.prognose?.arbeidsforEtterPeriode,
