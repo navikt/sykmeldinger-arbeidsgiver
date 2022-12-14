@@ -22,6 +22,7 @@ val postgresVersion = "42.5.0"
 val testContainerVersion = "1.17.6"
 val kotlinVersion = "1.7.21"
 val swaggerUiVersion = "4.15.0"
+val nettyCodecVersion = "4.1.86.Final"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
@@ -74,7 +75,7 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
-
+    implementation("io.netty:netty-codec:$nettyCodecVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
     swaggerUI("org.webjars:swagger-ui:$swaggerUiVersion")
