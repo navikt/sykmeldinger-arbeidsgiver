@@ -12,6 +12,9 @@ spec:
         - application: narmesteleder
     inbound:
       rules:
+        - application: oppfolgingsplan-frontend
+          namespace: team-esyfo
+          cluster: dev-gcp
         - application: debug-dings
           namespace: plattformsikkerhet
           cluster: dev-gcp
