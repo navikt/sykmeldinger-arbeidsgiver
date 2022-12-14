@@ -12,6 +12,9 @@ spec:
         - application: narmesteleder
     inbound:
       rules:
+        - application: oppfolgingsplan-frontend
+          namespace: team-esyfo
+          cluster: prod-gcp
         - application: dialogmote-frontend
           namespace: team-esyfo
           cluster: prod-gcp
