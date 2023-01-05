@@ -6,23 +6,24 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val coroutinesVersion = "1.6.4"
-val jacksonVersion = "2.14.0"
+val jacksonVersion = "2.14.1"
 val kluentVersion = "1.72"
-val ktorVersion = "2.1.3"
+val ktorVersion = "2.2.1"
 val logbackVersion = "1.4.5"
 val logstashEncoderVersion = "7.2"
 val prometheusVersion = "0.16.0"
 val kotestVersion = "5.5.4"
-val smCommonVersion = "1.1e5e122"
+val smCommonVersion = "1.1490275"
 val mockkVersion = "1.13.2"
 val nimbusdsVersion = "9.25.6"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.8.2"
-val postgresVersion = "42.5.0"
+val postgresVersion = "42.5.1"
 val testContainerVersion = "1.17.6"
-val kotlinVersion = "1.7.21"
+val kotlinVersion = "1.8.0"
 val swaggerUiVersion = "4.15.0"
 val nettyCodecVersion = "4.1.86.Final"
+val commonsCodecVersion = "1.15"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
@@ -30,7 +31,7 @@ tasks.withType<Jar> {
 
 plugins {
     id("org.jmailen.kotlinter") version "3.10.0"
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.8.0"
     id("com.diffplug.spotless") version "6.5.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
@@ -73,8 +74,12 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
+    // override transient version 1.13 from io.ktor:ktor-client-apache
+    implementation("commons-codec:commons-codec:$commonsCodecVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
+    //This is to override version that is in io.ktor:ktor-server-netty
+    //https://www.cve.org/CVERecord?id=CVE-2022-41915
     implementation("io.netty:netty-codec:$nettyCodecVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
@@ -115,6 +120,7 @@ tasks {
 
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
+        dependsOn("generateSwaggerUI")
     }
     withType<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
         outputDir = File(buildDir.path + "/resources/main/api")
