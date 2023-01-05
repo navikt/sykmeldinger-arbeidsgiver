@@ -41,7 +41,10 @@ fun createApplicationEngine(
     jwkProviderTokenX: JwkProvider,
     tokenXIssuer: String
 ): ApplicationEngine =
-    embeddedServer(Netty, env.applicationPort) {
+    embeddedServer(Netty, env.applicationPort, configure = {
+        // Increase timeout of Netty to handle large content bodies
+        responseWriteTimeoutSeconds = 40
+    }) {
         install(ContentNegotiation) {
             jackson {
                 registerKotlinModule()
