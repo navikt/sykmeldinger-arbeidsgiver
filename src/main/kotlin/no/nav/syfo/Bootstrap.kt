@@ -140,7 +140,7 @@ fun main() {
     val pdlClient = PdlClient(
         httpClient,
         env.pdlGraphqlPath,
-        PdlClient::class.java.getResource("/graphql/getPerson.graphql").readText().replace(Regex("[\n\t]"), "")
+        PdlClient::class.java.getResource("/graphql/getPerson.graphql")!!.readText().replace(Regex("[\n\t]"), "")
     )
     val pdlPersonService = PdlPersonService(pdlClient, accessTokenClient, env.pdlScope)
 

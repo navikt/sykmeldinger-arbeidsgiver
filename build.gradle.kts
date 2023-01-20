@@ -8,7 +8,7 @@ version = "1.0.0"
 val coroutinesVersion = "1.6.4"
 val jacksonVersion = "2.14.1"
 val kluentVersion = "1.72"
-val ktorVersion = "2.2.1"
+val ktorVersion = "2.2.2"
 val logbackVersion = "1.4.5"
 val logstashEncoderVersion = "7.2"
 val prometheusVersion = "0.16.0"
@@ -22,7 +22,6 @@ val postgresVersion = "42.5.1"
 val testContainerVersion = "1.17.6"
 val kotlinVersion = "1.8.0"
 val swaggerUiVersion = "4.15.0"
-val nettyCodecVersion = "4.1.86.Final"
 val commonsCodecVersion = "1.15"
 
 tasks.withType<Jar> {
@@ -78,9 +77,6 @@ dependencies {
     implementation("commons-codec:commons-codec:$commonsCodecVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
-    //This is to override version that is in io.ktor:ktor-server-netty
-    //https://www.cve.org/CVERecord?id=CVE-2022-41915
-    implementation("io.netty:netty-codec:$nettyCodecVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
     swaggerUI("org.webjars:swagger-ui:$swaggerUiVersion")

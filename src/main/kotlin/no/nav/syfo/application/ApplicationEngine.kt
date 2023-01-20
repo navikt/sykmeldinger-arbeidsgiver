@@ -18,7 +18,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.cors.CORS
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
 import io.ktor.server.routing.route
@@ -42,6 +42,7 @@ fun createApplicationEngine(
     tokenXIssuer: String
 ): ApplicationEngine =
     embeddedServer(Netty, env.applicationPort, configure = {
+
         // Increase timeout of Netty to handle large content bodies
         responseWriteTimeoutSeconds = 40
     }) {
