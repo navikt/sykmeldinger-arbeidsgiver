@@ -49,9 +49,9 @@ class SykmeldingServiceTest : FunSpec({
                     "Orgnavn",
                     getArbeidsgiverSykmelding(
                         fom = LocalDate.of(2021, 10, 1),
-                        tom = LocalDate.of(2021, 10, 9)
+                        tom = LocalDate.of(2021, 10, 9),
                     ),
-                )
+                ),
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo inaktivAnsatt
         }
@@ -67,9 +67,9 @@ class SykmeldingServiceTest : FunSpec({
                     "Orgnavn",
                     getArbeidsgiverSykmelding(
                         fom = LocalDate.now(),
-                        tom = LocalDate.now().plusDays(1)
+                        tom = LocalDate.now().plusDays(1),
                     ),
-                )
+                ),
             )
             sykmeldingsService.getSykmeldt("lederId", "fnr") shouldBeEqualTo ansatt
         }
@@ -83,7 +83,7 @@ class SykmeldingServiceTest : FunSpec({
                     "Orgnavn",
                     getArbeidsgiverSykmelding(
                         fom = LocalDate.now().minusDays(10),
-                        tom = LocalDate.now().minusDays(8)
+                        tom = LocalDate.now().minusDays(8),
                     ),
                 ),
                 SykmeldingArbeidsgiver(
@@ -94,7 +94,7 @@ class SykmeldingServiceTest : FunSpec({
                     "Orgnavn",
                     getArbeidsgiverSykmelding(
                         fom = LocalDate.now().minusDays(7),
-                        tom = LocalDate.now().plusDays(8)
+                        tom = LocalDate.now().plusDays(8),
                     ),
                 ),
             )

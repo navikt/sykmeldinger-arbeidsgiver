@@ -20,7 +20,7 @@ fun Application.setupAuth(
     env: Environment,
     loginserviceIssuer: String,
     jwkProviderTokenX: JwkProvider,
-    tokenXIssuer: String
+    tokenXIssuer: String,
 ) {
     install(Authentication) {
         jwt(name = "loginservice") {
@@ -37,7 +37,7 @@ fun Application.setupAuth(
                         val principal = JWTPrincipal(credentials.payload)
                         BrukerPrincipal(
                             fnr = finnFnrFraToken(principal),
-                            principal = principal
+                            principal = principal,
                         )
                     }
                     else -> unauthorized(credentials)
@@ -59,7 +59,7 @@ fun Application.setupAuth(
                             val principal = JWTPrincipal(credentials.payload)
                             BrukerPrincipal(
                                 fnr = finnFnrFraToken(principal),
-                                principal = principal
+                                principal = principal,
                             )
                         }
                     else -> unauthorized(credentials)
@@ -79,7 +79,7 @@ fun unauthorized(credentials: JWTCredential): Principal? {
     log.warn(
         "Auth: Unexpected audience for jwt {}, {}",
         StructuredArguments.keyValue("issuer", credentials.payload.issuer),
-        StructuredArguments.keyValue("audience", credentials.payload.audience)
+        StructuredArguments.keyValue("audience", credentials.payload.audience),
     )
     return null
 }
@@ -108,5 +108,5 @@ fun finnFnrFraToken(principal: JWTPrincipal): String {
 
 data class BrukerPrincipal(
     val fnr: String,
-    val principal: JWTPrincipal
+    val principal: JWTPrincipal,
 ) : Principal

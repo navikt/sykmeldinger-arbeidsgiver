@@ -16,7 +16,7 @@ import java.time.LocalDate
 class DeleteSykmeldingService(
     private val database: DatabaseInterface,
     private val leaderElection: LeaderElection,
-    private val applicationState: ApplicationState
+    private val applicationState: ApplicationState,
 ) {
 
     @DelicateCoroutinesApi

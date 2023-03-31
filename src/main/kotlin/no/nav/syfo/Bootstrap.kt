@@ -114,7 +114,7 @@ fun main() {
         loginserviceIssuer = wellKnown.issuer,
         dineSykmeldteService = dineSykmeldteService,
         jwkProviderTokenX = jwkProviderTokenX,
-        tokenXIssuer = wellKnownTokenX.issuer
+        tokenXIssuer = wellKnownTokenX.issuer,
     )
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
 
@@ -124,14 +124,14 @@ fun main() {
             it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
         }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
         StringDeserializer(),
-        JacksonKafkaDeserializer(Narmesteleder::class)
+        JacksonKafkaDeserializer(Narmesteleder::class),
     )
     val narmestelederDB = NarmestelederDB(database)
     val narmestelederConsumer = NarmestelederConsumer(
         narmestelederDB,
         aivenKafkaConsumer,
         env.narmestelederLeesahTopic,
-        applicationState
+        applicationState,
     )
 
     narmestelederConsumer.startConsumer()
@@ -140,7 +140,7 @@ fun main() {
     val pdlClient = PdlClient(
         httpClient,
         env.pdlGraphqlPath,
-        PdlClient::class.java.getResource("/graphql/getPerson.graphql")!!.readText().replace(Regex("[\n\t]"), "")
+        PdlClient::class.java.getResource("/graphql/getPerson.graphql")!!.readText().replace(Regex("[\n\t]"), ""),
     )
     val pdlPersonService = PdlPersonService(pdlClient, accessTokenClient, env.pdlScope)
 
@@ -150,11 +150,16 @@ fun main() {
             it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
         }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
         StringDeserializer(),
-        JacksonKafkaDeserializer(SykmeldingArbeidsgiverKafkaMessage::class)
+        JacksonKafkaDeserializer(SykmeldingArbeidsgiverKafkaMessage::class),
     )
 
     SykmeldingAivenService(
-        aivenKafkaSykmeldingConsumer, database, applicationState, env.syfoSendtSykmeldingTopicAiven, pdlPersonService, env.cluster
+        aivenKafkaSykmeldingConsumer,
+        database,
+        applicationState,
+        env.syfoSendtSykmeldingTopicAiven,
+        pdlPersonService,
+        env.cluster,
     ).startConsumer()
 
     val leaderElection = LeaderElection(httpClient, env.electorPath)
@@ -170,7 +175,7 @@ data class WellKnown(
     val authorization_endpoint: String,
     val token_endpoint: String,
     val jwks_uri: String,
-    val issuer: String
+    val issuer: String,
 )
 
 fun getWellKnownTokenX(httpClient: HttpClient, wellKnownUrl: String) =
@@ -180,5 +185,5 @@ fun getWellKnownTokenX(httpClient: HttpClient, wellKnownUrl: String) =
 data class WellKnownTokenX(
     val token_endpoint: String,
     val jwks_uri: String,
-    val issuer: String
+    val issuer: String,
 )

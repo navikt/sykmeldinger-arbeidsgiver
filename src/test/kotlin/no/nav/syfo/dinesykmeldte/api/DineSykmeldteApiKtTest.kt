@@ -52,7 +52,7 @@ class DineSykmeldteApiKtTest : FunSpec({
                 jwkProviderLoginservice = jwkProvider,
                 loginserviceIssuer = "iss",
                 jwkProviderTokenX = jwkProvider,
-                tokenXIssuer = "tokendings"
+                tokenXIssuer = "tokendings",
             )
 
             application.routing {
@@ -88,14 +88,14 @@ class DineSykmeldteApiKtTest : FunSpec({
                             "Navn Navnesen",
                             null,
                             aktivSykmelding = true,
-                        )
+                        ),
                     )
                 with(
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte") {
                         addHeader("Accept", "application/json")
                         addHeader("Content-Type", "application/json")
                         addHeader(HttpHeaders.Authorization, "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}")
-                    }
+                    },
                 ) {
                     response.status() shouldBeEqualTo HttpStatusCode.OK
                     val sykmeldt = objectMapper.readValue<List<Sykmeldt>>(response.content!!)
@@ -108,7 +108,7 @@ class DineSykmeldteApiKtTest : FunSpec({
                             "Navn Navnesen",
                             null,
                             aktivSykmelding = true,
-                        )
+                        ),
                     )
                 }
             }
@@ -128,7 +128,7 @@ class DineSykmeldteApiKtTest : FunSpec({
                         addHeader("Accept", "application/json")
                         addHeader("Content-Type", "application/json")
                         addHeader(HttpHeaders.Authorization, "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}")
-                    }
+                    },
                 ) {
                     response.status() shouldBeEqualTo HttpStatusCode.OK
                     val sykmeldt = objectMapper.readValue<Sykmeldt>(response.content!!)
@@ -149,7 +149,7 @@ class DineSykmeldteApiKtTest : FunSpec({
                     handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
                         addHeader("Accept", "application/json")
                         addHeader("Content-Type", "application/json")
-                    }
+                    },
                 ) {
                     response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
                 }

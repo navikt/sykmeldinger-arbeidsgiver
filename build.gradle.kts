@@ -8,12 +8,12 @@ version = "1.0.0"
 val coroutinesVersion = "1.6.4"
 val jacksonVersion = "2.14.2"
 val kluentVersion = "1.72"
-val ktorVersion = "2.2.3"
+val ktorVersion = "2.2.4"
 val logbackVersion = "1.4.5"
-val logstashEncoderVersion = "7.2"
+val logstashEncoderVersion = "7.3"
 val prometheusVersion = "0.16.0"
 val kotestVersion = "5.5.4"
-val smCommonVersion = "1.4d2de6e"
+val smCommonVersion = "1.9df1108"
 val mockkVersion = "1.13.2"
 val nimbusdsVersion = "9.25.6"
 val hikariVersion = "5.0.1"
@@ -29,10 +29,10 @@ tasks.withType<Jar> {
 }
 
 plugins {
-    id("org.jmailen.kotlinter") version "3.10.0"
+    id("org.jmailen.kotlinter") version "3.14.0"
     kotlin("jvm") version "1.8.10"
     id("com.diffplug.spotless") version "6.5.0"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
 }
 

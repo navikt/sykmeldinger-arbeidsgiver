@@ -25,7 +25,7 @@ class SykmeldingAivenService(
     private val applicationState: ApplicationState,
     private val topic: String,
     private val pdlPersonService: PdlPersonService,
-    private val cluster: String
+    private val cluster: String,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(SykmeldingAivenService::class.java)
@@ -35,6 +35,7 @@ class SykmeldingAivenService(
     private var lastLogTime = Instant.now().toEpochMilli()
     private val logTimer = 60_000L
     private var ignoredSykmeldinger = 0
+
     @DelicateCoroutinesApi
     fun startConsumer() {
         GlobalScope.launch(Dispatchers.Unbounded) {

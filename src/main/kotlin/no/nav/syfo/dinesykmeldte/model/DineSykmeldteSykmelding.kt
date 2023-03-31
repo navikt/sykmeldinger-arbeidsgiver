@@ -9,5 +9,5 @@ data class DineSykmeldteSykmelding(
     val arbeidsgiver: String?,
     val bekreftelse: Bekreftelse,
     val arbeidsevne: Arbeidsevne,
-    val innspillTilArbeidsgiver: String?
+    val innspillTilArbeidsgiver: String?,
 )

@@ -10,6 +10,8 @@ spec:
     outbound:
       rules:
         - application: narmesteleder
+      external:
+        - host: pdl-api.prod-fss-pub.nais.io
     inbound:
       rules:
         - application: oppfolgingsplan-frontend
@@ -56,12 +58,9 @@ spec:
     requests:
       cpu: 100m
       memory: 1Gi
-  vault:
-    enabled: false
   ingresses:
     - "https://sykmeldinger-arbeidsgiver.nav.no"
     - "https://sykmeldinger-arbeidsgiver.intern.nav.no"
-  webproxy: false
   kafka:
     pool: nav-prod
   tokenx:

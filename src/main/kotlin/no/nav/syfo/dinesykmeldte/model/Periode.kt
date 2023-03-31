@@ -8,5 +8,5 @@ data class Periode(
     val grad: Int?,
     val behandlingsdager: Int?,
     val reisetilskudd: Boolean,
-    val avventende: String?
+    val avventende: String?,
 )

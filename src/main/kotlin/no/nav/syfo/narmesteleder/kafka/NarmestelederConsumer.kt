@@ -18,7 +18,7 @@ class NarmestelederConsumer(
     private val narmestelederDB: NarmestelederDB,
     private val kafkaConsumer: KafkaConsumer<String, Narmesteleder>,
     private val narmestelederTopic: String,
-    private val applicationState: ApplicationState
+    private val applicationState: ApplicationState,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(NarmestelederConsumer::class.java)

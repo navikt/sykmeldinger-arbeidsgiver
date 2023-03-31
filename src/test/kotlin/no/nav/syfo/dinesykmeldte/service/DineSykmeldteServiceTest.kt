@@ -24,7 +24,7 @@ class DineSykmeldteServiceTest : FunSpec({
                     "orgnummer",
                     "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123"),
-                )
+                ),
             )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
             sykmeldte.size shouldBeEqualTo 1
@@ -34,9 +34,13 @@ class DineSykmeldteServiceTest : FunSpec({
         test("Should return aktivSykmelding false for old sick leave") {
             every { sykmeldingService.getSykmeldinger("123") } returns listOf(
                 SykmeldingArbeidsgiver(
-                    "lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn",
+                    "lederFnr",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123", fom = LocalDate.of(2020, 1, 1), tom = LocalDate.of(2020, 1, 7)),
-                )
+                ),
             )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
             sykmeldte.size shouldBeEqualTo 1
@@ -46,13 +50,21 @@ class DineSykmeldteServiceTest : FunSpec({
         test("getSykmeldinger() should groupBy") {
             every { sykmeldingService.getSykmeldinger("123") } returns listOf(
                 SykmeldingArbeidsgiver(
-                    "lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn",
+                    "lederFnr",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123"),
                 ),
                 SykmeldingArbeidsgiver(
-                    "lederFnr", "Fornavn Etternavn", "pasientFnr", "orgnummer", "Orgnavn",
+                    "lederFnr",
+                    "Fornavn Etternavn",
+                    "pasientFnr",
+                    "orgnummer",
+                    "Orgnavn",
                     getArbeidsgiverSykmelding(sykmeldingsId = "123", fom = LocalDate.of(2020, 1, 1), tom = LocalDate.of(2020, 1, 7)),
-                )
+                ),
             )
             val sykmeldte = dineSykmeldteService.getDineSykmeldte("123")
             sykmeldte.size shouldBeEqualTo 1

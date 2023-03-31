@@ -25,7 +25,7 @@ fun generateJWTLoginservice(
     expiry: LocalDateTime? = LocalDateTime.now().plusHours(1),
     subject: String = "subject",
     issuer: String = "iss",
-    level: String = "Level4"
+    level: String = "Level4",
 ): String {
     val now = Date()
     val key = getDefaultRSAKey()

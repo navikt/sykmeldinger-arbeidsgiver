@@ -28,6 +28,8 @@ class SykmeldingService(val database: DatabaseInterface) {
                 sykmeldinger = null,
                 aktivSykmelding = arbeidsgiverSykmeldinger.any { it.sykmelding.sykmeldingsperioder.isActive() },
             )
-        } else null
+        } else {
+            null
+        }
     }
 }

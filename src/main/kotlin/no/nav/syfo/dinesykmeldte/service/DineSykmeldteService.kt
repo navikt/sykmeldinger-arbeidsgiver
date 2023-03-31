@@ -7,7 +7,7 @@ import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.sykmelding.SykmeldingService
 
 class DineSykmeldteService(
-    private val sykmeldingService: SykmeldingService
+    private val sykmeldingService: SykmeldingService,
 ) {
     fun getSykmeldt(narmestelederId: String, fnr: String): Sykmeldt? {
         return sykmeldingService.getSykmeldt(narmestelederId, fnr)
@@ -20,7 +20,7 @@ class DineSykmeldteService(
                 fnr = it.pasientFnr,
                 navn = it.navn,
                 orgnummer = it.orgnummer,
-                narmestelederId = it.narmestelederId
+                narmestelederId = it.narmestelederId,
             )
         }.map { ansatt ->
             Sykmeldt(

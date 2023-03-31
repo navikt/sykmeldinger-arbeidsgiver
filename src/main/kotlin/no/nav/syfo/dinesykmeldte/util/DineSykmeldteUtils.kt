@@ -17,29 +17,29 @@ fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmel
     return DineSykmeldteSykmelding(
         pasient = Pasient(
             fnr = pasientFnr,
-            navn = ansatt.navn
+            navn = ansatt.navn,
         ),
         sykmeldingId = sykmelding.id,
         mulighetForArbeid = MulighetForArbeid(
             perioder = getPerioder(),
             aktivitetIkkeMulig434 = getAktivitetIkkeMulig(this.sykmelding.sykmeldingsperioder),
-            aarsakAktivitetIkkeMulig434 = getAktivitetIkkeMuligBeskrivelse(this.sykmelding.sykmeldingsperioder)
+            aarsakAktivitetIkkeMulig434 = getAktivitetIkkeMuligBeskrivelse(this.sykmelding.sykmeldingsperioder),
         ),
         skalViseSkravertFelt = true,
         arbeidsgiver = this.orgNavn,
         innspillTilArbeidsgiver = this.sykmelding.meldingTilArbeidsgiver,
         arbeidsevne = Arbeidsevne(
-            tilretteleggingArbeidsplass = this.sykmelding.tiltakArbeidsplassen
+            tilretteleggingArbeidsplass = this.sykmelding.tiltakArbeidsplassen,
         ),
         bekreftelse = Bekreftelse(
             sykmelder = this.sykmelding.behandler?.let { getSykmelderNavn(it) } ?: "",
             utstedelsesdato = this.sykmelding.behandletTidspunkt.toLocalDate(),
-            sykmelderTlf = this.sykmelding.behandler?.tlf
+            sykmelderTlf = this.sykmelding.behandler?.tlf,
         ),
         friskmelding = Friskmelding(
             arbeidsfoerEtterPerioden = this.sykmelding.prognose?.arbeidsforEtterPeriode,
             hensynPaaArbeidsplassen = this.sykmelding.prognose?.hensynArbeidsplassen,
-        )
+        ),
     )
 }
 

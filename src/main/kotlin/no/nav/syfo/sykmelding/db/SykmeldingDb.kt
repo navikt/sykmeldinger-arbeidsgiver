@@ -19,7 +19,7 @@ private fun insertOrUpdateSykmeldt(
     connection: Connection,
     latestTom: LocalDate,
     fnr: String,
-    navn: String
+    navn: String,
 ) {
     connection.prepareStatement(
         """
@@ -28,7 +28,7 @@ private fun insertOrUpdateSykmeldt(
             on conflict (pasient_fnr) do update
                 set pasient_navn = ?,
                     latest_tom = ?;
-        """
+        """,
     ).use { ps ->
         var index = 1
         var latestDate = Date.valueOf(latestTom)
@@ -50,7 +50,7 @@ fun DatabaseInterface.getAnsatt(narmestelederId: String, lederFnr: String): Ansa
             select nl.narmeste_leder_id, s.pasient_fnr, s.pasient_navn, nl.orgnummer from narmesteleder as nl
             inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
             where nl.narmeste_leder_id = ? and nl.leder_fnr = ?;
-        """
+        """,
         ).use { ps ->
             ps.setString(1, narmestelederId)
             ps.setString(2, lederFnr)
@@ -74,19 +74,19 @@ private fun ResultSet.toAnsatt(): Ansatt? {
 fun DatabaseInterface.insertOrUpdateSykmeldingArbeidsgiver(
     sendtSykmeldingKafkaMessage: SykmeldingArbeidsgiverKafkaMessage,
     person: PdlPerson,
-    latestTom: LocalDate
+    latestTom: LocalDate,
 ) {
     connection.use {
         insertOrUpdateArbeidsgiverSykmelding(
             connection = it,
             sendtSykmeldingKafkaMessage = sendtSykmeldingKafkaMessage,
-            latestTom = latestTom
+            latestTom = latestTom,
         )
         insertOrUpdateSykmeldt(
             connection = it,
             fnr = sendtSykmeldingKafkaMessage.kafkaMetadata.fnr,
             navn = person.navn.toFormattedNameString(),
-            latestTom = latestTom
+            latestTom = latestTom,
         )
         it.commit()
     }
@@ -97,7 +97,7 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
         it.prepareStatement(
             """
             DELETE from sykmelding_arbeidsgiver where sykmelding_id = ?
-        """
+        """,
         ).use { ps ->
             ps.setString(1, key)
             ps.execute()
@@ -109,7 +109,7 @@ fun DatabaseInterface.deleteSykmelding(key: String) {
 private fun insertOrUpdateArbeidsgiverSykmelding(
     connection: Connection,
     sendtSykmeldingKafkaMessage: SykmeldingArbeidsgiverKafkaMessage,
-    latestTom: LocalDate
+    latestTom: LocalDate,
 ) {
     connection.prepareStatement(
         """
@@ -123,7 +123,7 @@ private fun insertOrUpdateArbeidsgiverSykmelding(
                         latest_tom = ?,
                         orgnavn = ?,
                         sykmelding = ?;
-         """
+         """,
     ).use { ps ->
         val sykmeldingId = sendtSykmeldingKafkaMessage.sykmelding.id
         val pasientFnr = sendtSykmeldingKafkaMessage.kafkaMetadata.fnr
@@ -163,7 +163,7 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<Sykmel
                         inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
                         inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
                     where nl.leder_fnr = ?;
-                """
+                """,
         ).use { ps ->
             ps.setString(1, lederFnr)
             ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
@@ -179,7 +179,7 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelede
                     inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
                     where nl.leder_fnr = ?
                        and nl.narmeste_leder_id = ?;
-                """
+                """,
         ).use { ps ->
             ps.setString(1, lederFnr)
             ps.setString(2, narmestelederId)
@@ -191,7 +191,7 @@ fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelede
 fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult = connection.use { connection ->
     val result = DeleteResult(
         deletedSykmelding = deleteSykmeldinger(connection, date),
-        deletedSykmeldt = deleteSykmeldte(connection, date)
+        deletedSykmeldt = deleteSykmeldte(connection, date),
     )
     connection.commit()
     return result
@@ -218,7 +218,7 @@ fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiver {
         orgnummer = getString("orgnummer"),
         orgNavn = getString("orgnavn") ?: "",
         navn = getString("pasient_navn"),
-        sykmelding = objectMapper.readValue(getString("sykmelding"))
+        sykmelding = objectMapper.readValue(getString("sykmelding")),
     )
 }
 

@@ -46,14 +46,17 @@ class SykmeldingAivenServiceTest : FunSpec({
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(
                         ConsumerRecord(
-                            "topic", 1, 1, "String",
+                            "topic",
+                            1,
+                            1,
+                            "String",
                             getSykmeldingArbeidsgiverKafkaMessage(
                                 LocalDate.now().minusMonths(5),
-                                LocalDate.now().minusMonths(4)
-                            )
-                        )
-                    )
-                )
+                                LocalDate.now().minusMonths(4),
+                            ),
+                        ),
+                    ),
+                ),
             )
             every { applicationState.ready } returns true andThen false
             every { kafkaConsumer.poll(any<Duration>()) } returns consumerRecords
@@ -67,14 +70,17 @@ class SykmeldingAivenServiceTest : FunSpec({
                 mutableMapOf<TopicPartition, List<ConsumerRecord<String, SykmeldingArbeidsgiverKafkaMessage?>>>(
                     TopicPartition("1", 1) to listOf(
                         ConsumerRecord(
-                            "topic", 1, 1, "String",
+                            "topic",
+                            1,
+                            1,
+                            "String",
                             getSykmeldingArbeidsgiverKafkaMessage(
                                 fom = LocalDate.now().minusMonths(5),
-                                tom = LocalDate.now().minusMonths(4).minusDays(1)
-                            )
-                        )
-                    )
-                )
+                                tom = LocalDate.now().minusMonths(4).minusDays(1),
+                            ),
+                        ),
+                    ),
+                ),
             )
             every { applicationState.ready } returns true andThen false
             every { kafkaConsumer.poll(any<Duration>()) } returns consumerRecords

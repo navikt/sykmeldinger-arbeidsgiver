@@ -64,7 +64,7 @@ class SykmeldingDbKtTest : FunSpec({
                 delete from sykmelding_arbeidsgiver;
                 delete from narmesteleder;
                 delete from sykmeldt;
-                """.trimIndent()
+                """.trimIndent(),
             ).use { ps ->
                 ps.execute()
             }
@@ -76,7 +76,7 @@ class SykmeldingDbKtTest : FunSpec({
         test("Save ArbeidsgiverSykmelding") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
-                LocalDate.now()
+                LocalDate.now(),
             )
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
@@ -92,7 +92,7 @@ class SykmeldingDbKtTest : FunSpec({
         test("test should delete") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 fom = LocalDate.of(2021, 1, 1),
-                tom = LocalDate.of(2021, 2, 1)
+                tom = LocalDate.of(2021, 2, 1),
             )
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
@@ -104,7 +104,7 @@ class SykmeldingDbKtTest : FunSpec({
         test("test should not delete") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 fom = LocalDate.of(2021, 1, 1),
-                tom = LocalDate.of(2021, 2, 1)
+                tom = LocalDate.of(2021, 2, 1),
             )
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
@@ -117,7 +117,7 @@ class SykmeldingDbKtTest : FunSpec({
 
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
-                LocalDate.now()
+                LocalDate.now(),
             )
             val newSykmelding = arbeidsgiverSykmelding.copy(sykmelding = arbeidsgiverSykmelding.sykmelding.copy(id = "1234", sykmeldingsperioder = arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.map { it.copy(fom = LocalDate.now().plusDays(10), tom = LocalDate.now().plusDays(20)) }))
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
@@ -139,7 +139,7 @@ class SykmeldingDbKtTest : FunSpec({
         test("Get ArbeidsgiverSykmeldinger from leder fnr") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
-                LocalDate.now()
+                LocalDate.now(),
             )
             val uuid = UUID.randomUUID().toString()
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
@@ -159,7 +159,7 @@ class SykmeldingDbKtTest : FunSpec({
         test("should join in lest status") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
-                LocalDate.now()
+                LocalDate.now(),
             )
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
@@ -172,7 +172,7 @@ class SykmeldingDbKtTest : FunSpec({
         test("Get ArbeidsgiverSykmeldinger from leder fnr and narmeste leder id") {
             val arbeidsgiverSykmelding: SykmeldingArbeidsgiverKafkaMessage = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
-                LocalDate.now()
+                LocalDate.now(),
             )
             val person = PdlPerson(navn = Navn("Fornavn", mellomnavn = "Mellomnavn", "Etternavn"), aktorId = null)
             database.insertOrUpdateSykmeldingArbeidsgiver(arbeidsgiverSykmelding, person, arbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
@@ -182,7 +182,7 @@ class SykmeldingDbKtTest : FunSpec({
             val nyArbeidsgiverSykmelding = getSykmeldingArbeidsgiverKafkaMessage(
                 LocalDate.now(),
                 LocalDate.now(),
-                sykmeldtFnr = "22221145712"
+                sykmeldtFnr = "22221145712",
             )
 
             database.insertOrUpdateSykmeldingArbeidsgiver(nyArbeidsgiverSykmelding, person, nyArbeidsgiverSykmelding.sykmelding.sykmeldingsperioder.maxOf { it.tom })
@@ -200,14 +200,17 @@ fun getSykmeldingArbeidsgiverKafkaMessage(fom: LocalDate, tom: LocalDate, sykmel
             arbeidsgiver = ArbeidsgiverStatusDTO(
                 orgnummer = "123456789",
                 juridiskOrgnummer = "234567891",
-                orgNavn = "arbeidsgiver"
+                orgNavn = "arbeidsgiver",
             ),
-            emptyList()
+            emptyList(),
         ),
         kafkaMetadata = KafkaMetadataDTO(
-            sykmeldingsId, OffsetDateTime.now(ZoneOffset.UTC), fnr = sykmeldtFnr, source = "user"
+            sykmeldingsId,
+            OffsetDateTime.now(ZoneOffset.UTC),
+            fnr = sykmeldtFnr,
+            source = "user",
         ),
-        sykmelding = getArbeidsgiverSykmelding(fom = fom, tom = tom, sykmeldingsId = sykmeldingsId)
+        sykmelding = getArbeidsgiverSykmelding(fom = fom, tom = tom, sykmeldingsId = sykmeldingsId),
     )
 }
 
@@ -225,7 +228,7 @@ fun getArbeidsgiverSykmelding(fom: LocalDate = LocalDate.now(), tom: LocalDate =
             etternavn = "etternavn",
             hpr = null,
             adresse = AdresseDTO(null, null, null, null, null),
-            tlf = null
+            tlf = null,
         ),
         sykmeldingsperioder = listOf(
             SykmeldingsperiodeAGDTO(
@@ -236,24 +239,24 @@ fun getArbeidsgiverSykmelding(fom: LocalDate = LocalDate.now(), tom: LocalDate =
                 innspillTilArbeidsgiver = null,
                 type = PeriodetypeDTO.AKTIVITET_IKKE_MULIG,
                 aktivitetIkkeMulig = null,
-                reisetilskudd = false
-            )
+                reisetilskudd = false,
+            ),
         ),
         arbeidsgiver = ArbeidsgiverAGDTO(
             navn = "arbeidsgiver",
-            yrkesbetegnelse = "yrke"
+            yrkesbetegnelse = "yrke",
         ),
         kontaktMedPasient = KontaktMedPasientAGDTO(
-            kontaktDato = LocalDate.now()
+            kontaktDato = LocalDate.now(),
         ),
         prognose = PrognoseAGDTO(
             arbeidsforEtterPeriode = true,
-            hensynArbeidsplassen = null
+            hensynArbeidsplassen = null,
         ),
         egenmeldt = false,
         papirsykmelding = false,
         harRedusertArbeidsgiverperiode = false,
         merknader = emptyList(),
-        utenlandskSykmelding = null
+        utenlandskSykmelding = null,
     )
 }

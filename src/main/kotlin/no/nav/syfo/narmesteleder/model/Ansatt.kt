@@ -4,5 +4,5 @@ data class Ansatt(
     val fnr: String,
     val navn: String,
     val orgnummer: String,
-    val narmestelederId: String
+    val narmestelederId: String,
 )

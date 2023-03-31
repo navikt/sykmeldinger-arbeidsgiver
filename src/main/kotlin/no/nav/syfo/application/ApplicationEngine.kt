@@ -39,10 +39,9 @@ fun createApplicationEngine(
     jwkProvider: JwkProvider,
     loginserviceIssuer: String,
     jwkProviderTokenX: JwkProvider,
-    tokenXIssuer: String
+    tokenXIssuer: String,
 ): ApplicationEngine =
     embeddedServer(Netty, env.applicationPort, configure = {
-
         // Increase timeout of Netty to handle large content bodies
         responseWriteTimeoutSeconds = 40
     }) {
@@ -61,7 +60,7 @@ fun createApplicationEngine(
             env = env,
             loginserviceIssuer = loginserviceIssuer,
             jwkProviderTokenX = jwkProviderTokenX,
-            tokenXIssuer = tokenXIssuer
+            tokenXIssuer = tokenXIssuer,
         )
         install(CORS) {
             allowMethod(HttpMethod.Get)
