@@ -21,7 +21,7 @@ val flywayVersion = "9.8.2"
 val postgresVersion = "42.5.1"
 val testContainerVersion = "1.17.6"
 val kotlinVersion = "1.8.20"
-val swaggerUiVersion = "4.15.0"
+val swaggerUiVersion = "4.18.2"
 val commonsCodecVersion = "1.15"
 
 tasks.withType<Jar> {
