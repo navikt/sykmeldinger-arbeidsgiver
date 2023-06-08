@@ -20,7 +20,7 @@ val hikariVersion = "5.0.1"
 val flywayVersion = "9.19.3"
 val postgresVersion = "42.6.0"
 val testContainerVersion = "1.18.3"
-val kotlinVersion = "1.8.21"
+val kotlinVersion = "1.8.22"
 val swaggerUiVersion = "4.19.0"
 val commonsCodecVersion = "1.15"
 
