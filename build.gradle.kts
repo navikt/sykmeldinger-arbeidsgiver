@@ -22,7 +22,7 @@ val postgresVersion = "42.6.0"
 val testContainerVersion = "1.18.3"
 val kotlinVersion = "1.8.22"
 val swaggerUiVersion = "5.1.0"
-val commonsCodecVersion = "1.15"
+val commonsCodecVersion = "1.16.0"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
