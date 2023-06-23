@@ -13,7 +13,8 @@ data class Environment(
     val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val syfoSendtSykmeldingTopicAiven: String = "teamsykmelding.syfo-sendt-sykmelding",
     val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
-    val loginserviceIdportenAudience: List<String> = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
+    val loginserviceIdportenAudience: List<String> =
+        getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE").split(","),
     val allowedOrigin: List<String> = getEnvVar("ALLOWED_ORIGIN").split(","),
     val narmestelederUrl: String = getEnvVar("NARMESTELEDER_URL", "http://narmesteleder"),
     val narmestelederLeesahTopic: String = "teamsykmelding.syfo-narmesteleder-leesah",
@@ -33,4 +34,5 @@ data class Environment(
 }
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
-    System.getenv(varName) ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")
+    System.getenv(varName)
+        ?: defaultValue ?: throw RuntimeException("Missing required variable \"$varName\"")

@@ -23,6 +23,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import java.util.UUID
 import no.nav.syfo.Environment
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.api.setupSwaggerDocApi
@@ -30,7 +31,6 @@ import no.nav.syfo.application.metrics.monitorHttpRequests
 import no.nav.syfo.dinesykmeldte.api.registerDineSykmeldteApi
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
-import java.util.UUID
 
 fun createApplicationEngine(
     env: Environment,
@@ -41,10 +41,14 @@ fun createApplicationEngine(
     jwkProviderTokenX: JwkProvider,
     tokenXIssuer: String,
 ): ApplicationEngine =
-    embeddedServer(Netty, env.applicationPort, configure = {
-        // Increase timeout of Netty to handle large content bodies
-        responseWriteTimeoutSeconds = 40
-    }) {
+    embeddedServer(
+        Netty,
+        env.applicationPort,
+        configure = {
+            // Increase timeout of Netty to handle large content bodies
+            responseWriteTimeoutSeconds = 40
+        }
+    ) {
         install(ContentNegotiation) {
             jackson {
                 registerKotlinModule()
@@ -65,9 +69,7 @@ fun createApplicationEngine(
         install(CORS) {
             allowMethod(HttpMethod.Get)
             allowMethod(HttpMethod.Options)
-            env.allowedOrigin.forEach {
-                hosts.add("https://$it")
-            }
+            env.allowedOrigin.forEach { hosts.add("https://$it") }
             allowHeader("nav_csrf_protection")
             allowCredentials = true
             allowNonSimpleContentTypes = true
@@ -90,14 +92,10 @@ fun createApplicationEngine(
                 setupSwaggerDocApi()
             }
             authenticate("loginservice") {
-                route("/api") {
-                    registerDineSykmeldteApi(dineSykmeldteService)
-                }
+                route("/api") { registerDineSykmeldteApi(dineSykmeldteService) }
             }
             authenticate("tokenx") {
-                route("/api/v2") {
-                    registerDineSykmeldteApi(dineSykmeldteService)
-                }
+                route("/api/v2") { registerDineSykmeldteApi(dineSykmeldteService) }
             }
         }
         intercept(ApplicationCallPipeline.Monitoring, monitorHttpRequests())

@@ -11,12 +11,13 @@ class SykmeldingService(val database: DatabaseInterface) {
         return database.getArbeidsgiverSykmeldinger(lederFnr)
     }
 
-    /**
-     * Get a sykmeldt for for a given narmesteleder + lederFnr
-     */
+    /** Get a sykmeldt for for a given narmesteleder + lederFnr */
     fun getSykmeldt(narmestelederId: String, lederFnr: String): Sykmeldt? {
         val arbeidsgiverSykmeldinger =
-            database.getArbeidsgiverSykmeldinger(lederFnr = lederFnr, narmestelederId = narmestelederId)
+            database.getArbeidsgiverSykmeldinger(
+                lederFnr = lederFnr,
+                narmestelederId = narmestelederId
+            )
         val sykmeldingArbeidsgiverV2 = arbeidsgiverSykmeldinger.firstOrNull()
 
         return if (sykmeldingArbeidsgiverV2 != null) {
@@ -26,7 +27,8 @@ class SykmeldingService(val database: DatabaseInterface) {
                 fnr = sykmeldingArbeidsgiverV2.pasientFnr,
                 navn = sykmeldingArbeidsgiverV2.navn,
                 sykmeldinger = null,
-                aktivSykmelding = arbeidsgiverSykmeldinger.any { it.sykmelding.sykmeldingsperioder.isActive() },
+                aktivSykmelding =
+                    arbeidsgiverSykmeldinger.any { it.sykmelding.sykmeldingsperioder.isActive() },
             )
         } else {
             null

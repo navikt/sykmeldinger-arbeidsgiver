@@ -1,5 +1,6 @@
 package no.nav.syfo.sykmelding
 
+import java.time.LocalDate
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -11,7 +12,6 @@ import no.nav.syfo.application.leaderelection.LeaderElection
 import no.nav.syfo.log
 import no.nav.syfo.sykmelding.db.deleteSykmeldinger
 import no.nav.syfo.util.Unbounded
-import java.time.LocalDate
 
 class DeleteSykmeldingService(
     private val database: DatabaseInterface,
@@ -26,7 +26,9 @@ class DeleteSykmeldingService(
                 if (leaderElection.isLeader()) {
                     try {
                         val result = database.deleteSykmeldinger(getDeleteDate())
-                        log.info("Deleted ${result.deletedSykmelding} sykmeldinger and ${result.deletedSykmeldt} sykmeldte")
+                        log.info(
+                            "Deleted ${result.deletedSykmelding} sykmeldinger and ${result.deletedSykmeldt} sykmeldte"
+                        )
                     } catch (ex: Exception) {
                         log.error("Could not delete sykmeldinger/sykmeldt", ex)
                     }

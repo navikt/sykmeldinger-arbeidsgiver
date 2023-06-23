@@ -18,6 +18,8 @@ import io.ktor.client.request.get
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.serialization.jackson.jackson
 import io.prometheus.client.hotspot.DefaultExports
+import java.net.URL
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.application.ApplicationServer
@@ -45,8 +47,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URL
-import java.util.concurrent.TimeUnit
 
 val log: Logger = LoggerFactory.getLogger("no.nav.syfo.sykmeldinger-arbeidsgiver")
 
@@ -69,7 +69,8 @@ fun main() {
         HttpResponseValidator {
             handleResponseExceptionWithRequest { exception, _ ->
                 when (exception) {
-                    is SocketTimeoutException -> throw ServiceUnavailableException(exception.message)
+                    is SocketTimeoutException ->
+                        throw ServiceUnavailableException(exception.message)
                 }
             }
         }
@@ -81,7 +82,9 @@ fun main() {
             }
             retryIf(maxRetries) { request, response ->
                 if (response.status.value.let { it in 500..599 }) {
-                    log.warn("Retrying for statuscode ${response.status.value}, for url ${request.url}")
+                    log.warn(
+                        "Retrying for statuscode ${response.status.value}, for url ${request.url}"
+                    )
                     true
                 } else {
                     false
@@ -92,83 +95,101 @@ fun main() {
     val httpClient = HttpClient(Apache, config)
 
     val wellKnown = getWellKnown(httpClient, env.loginserviceIdportenDiscoveryUrl)
-    val jwkProviderLoginservice = JwkProviderBuilder(URL(wellKnown.jwks_uri))
-        .cached(10, 24, TimeUnit.HOURS)
-        .rateLimited(10, 1, TimeUnit.MINUTES)
-        .build()
+    val jwkProviderLoginservice =
+        JwkProviderBuilder(URL(wellKnown.jwks_uri))
+            .cached(10, 24, TimeUnit.HOURS)
+            .rateLimited(10, 1, TimeUnit.MINUTES)
+            .build()
 
     val wellKnownTokenX = getWellKnownTokenX(httpClient, env.tokenXWellKnownUrl)
-    val jwkProviderTokenX = JwkProviderBuilder(URL(wellKnownTokenX.jwks_uri))
-        .cached(10, 24, TimeUnit.HOURS)
-        .rateLimited(10, 1, TimeUnit.MINUTES)
-        .build()
+    val jwkProviderTokenX =
+        JwkProviderBuilder(URL(wellKnownTokenX.jwks_uri))
+            .cached(10, 24, TimeUnit.HOURS)
+            .rateLimited(10, 1, TimeUnit.MINUTES)
+            .build()
 
     val sykmeldingService = SykmeldingService(database = database)
 
     val dineSykmeldteService = DineSykmeldteService(sykmeldingService)
 
-    val applicationEngine = createApplicationEngine(
-        env,
-        applicationState,
-        jwkProvider = jwkProviderLoginservice,
-        loginserviceIssuer = wellKnown.issuer,
-        dineSykmeldteService = dineSykmeldteService,
-        jwkProviderTokenX = jwkProviderTokenX,
-        tokenXIssuer = wellKnownTokenX.issuer,
-    )
+    val applicationEngine =
+        createApplicationEngine(
+            env,
+            applicationState,
+            jwkProvider = jwkProviderLoginservice,
+            loginserviceIssuer = wellKnown.issuer,
+            dineSykmeldteService = dineSykmeldteService,
+            jwkProviderTokenX = jwkProviderTokenX,
+            tokenXIssuer = wellKnownTokenX.issuer,
+        )
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
 
-    val aivenKafkaConsumer = KafkaConsumer(
-        KafkaUtils.getAivenKafkaConfig().also {
-            it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
-            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
-        }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
-        StringDeserializer(),
-        JacksonKafkaDeserializer(Narmesteleder::class),
-    )
+    val aivenKafkaConsumer =
+        KafkaConsumer(
+            KafkaUtils.getAivenKafkaConfig()
+                .also {
+                    it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
+                    it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
+                }
+                .toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
+            StringDeserializer(),
+            JacksonKafkaDeserializer(Narmesteleder::class),
+        )
     val narmestelederDB = NarmestelederDB(database)
-    val narmestelederConsumer = NarmestelederConsumer(
-        narmestelederDB,
-        aivenKafkaConsumer,
-        env.narmestelederLeesahTopic,
-        applicationState,
-    )
+    val narmestelederConsumer =
+        NarmestelederConsumer(
+            narmestelederDB,
+            aivenKafkaConsumer,
+            env.narmestelederLeesahTopic,
+            applicationState,
+        )
 
     narmestelederConsumer.startConsumer()
 
-    val accessTokenClient = AccessTokenClient(env.aadAccessTokenUrl, env.clientId, env.clientSecret, httpClient)
-    val pdlClient = PdlClient(
-        httpClient,
-        env.pdlGraphqlPath,
-        PdlClient::class.java.getResource("/graphql/getPerson.graphql")!!.readText().replace(Regex("[\n\t]"), ""),
-    )
+    val accessTokenClient =
+        AccessTokenClient(env.aadAccessTokenUrl, env.clientId, env.clientSecret, httpClient)
+    val pdlClient =
+        PdlClient(
+            httpClient,
+            env.pdlGraphqlPath,
+            PdlClient::class
+                .java
+                .getResource("/graphql/getPerson.graphql")!!
+                .readText()
+                .replace(Regex("[\n\t]"), ""),
+        )
     val pdlPersonService = PdlPersonService(pdlClient, accessTokenClient, env.pdlScope)
 
-    val aivenKafkaSykmeldingConsumer = KafkaConsumer(
-        KafkaUtils.getAivenKafkaConfig().also {
-            it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
-            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
-        }.toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
-        StringDeserializer(),
-        JacksonKafkaDeserializer(SykmeldingArbeidsgiverKafkaMessage::class),
-    )
+    val aivenKafkaSykmeldingConsumer =
+        KafkaConsumer(
+            KafkaUtils.getAivenKafkaConfig()
+                .also {
+                    it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
+                    it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
+                }
+                .toConsumerConfig("sykmeldinger-arbeidsgiver", JacksonKafkaDeserializer::class),
+            StringDeserializer(),
+            JacksonKafkaDeserializer(SykmeldingArbeidsgiverKafkaMessage::class),
+        )
 
     SykmeldingAivenService(
-        aivenKafkaSykmeldingConsumer,
-        database,
-        applicationState,
-        env.syfoSendtSykmeldingTopicAiven,
-        pdlPersonService,
-        env.cluster,
-    ).startConsumer()
+            aivenKafkaSykmeldingConsumer,
+            database,
+            applicationState,
+            env.syfoSendtSykmeldingTopicAiven,
+            pdlPersonService,
+            env.cluster,
+        )
+        .startConsumer()
 
     val leaderElection = LeaderElection(httpClient, env.electorPath)
     DeleteSykmeldingService(database, leaderElection, applicationState).start()
     applicationServer.start()
 }
 
-fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) =
-    runBlocking { httpClient.get(wellKnownUrl).body<WellKnown>() }
+fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) = runBlocking {
+    httpClient.get(wellKnownUrl).body<WellKnown>()
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class WellKnown(
@@ -178,8 +199,9 @@ data class WellKnown(
     val issuer: String,
 )
 
-fun getWellKnownTokenX(httpClient: HttpClient, wellKnownUrl: String) =
-    runBlocking { httpClient.get(wellKnownUrl).body<WellKnownTokenX>() }
+fun getWellKnownTokenX(httpClient: HttpClient, wellKnownUrl: String) = runBlocking {
+    httpClient.get(wellKnownUrl).body<WellKnownTokenX>()
+}
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class WellKnownTokenX(

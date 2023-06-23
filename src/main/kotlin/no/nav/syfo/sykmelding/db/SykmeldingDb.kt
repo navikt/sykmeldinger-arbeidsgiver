@@ -1,6 +1,11 @@
 package no.nav.syfo.sykmelding.db
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import java.sql.Connection
+import java.sql.Date
+import java.sql.ResultSet
+import java.sql.Timestamp
+import java.time.LocalDate
 import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.pdl.model.PdlPerson
@@ -9,11 +14,6 @@ import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
 import no.nav.syfo.util.objectMapper
 import no.nav.syfo.util.toPGObject
-import java.sql.Connection
-import java.sql.Date
-import java.sql.ResultSet
-import java.sql.Timestamp
-import java.time.LocalDate
 
 private fun insertOrUpdateSykmeldt(
     connection: Connection,
@@ -21,53 +21,58 @@ private fun insertOrUpdateSykmeldt(
     fnr: String,
     navn: String,
 ) {
-    connection.prepareStatement(
-        """
+    connection
+        .prepareStatement(
+            """
             insert into sykmeldt(pasient_fnr, pasient_navn, latest_tom)
                 values (?,?,?)
             on conflict (pasient_fnr) do update
                 set pasient_navn = ?,
                     latest_tom = ?;
         """,
-    ).use { ps ->
-        var index = 1
-        var latestDate = Date.valueOf(latestTom)
-        // insert
-        ps.setString(index++, fnr)
-        ps.setString(index++, navn)
-        ps.setDate(index++, latestDate)
-        // update
-        ps.setString(index++, navn)
-        ps.setDate(index, latestDate)
-        ps.execute()
-    }
+        )
+        .use { ps ->
+            var index = 1
+            var latestDate = Date.valueOf(latestTom)
+            // insert
+            ps.setString(index++, fnr)
+            ps.setString(index++, navn)
+            ps.setDate(index++, latestDate)
+            // update
+            ps.setString(index++, navn)
+            ps.setDate(index, latestDate)
+            ps.execute()
+        }
 }
 
 fun DatabaseInterface.getAnsatt(narmestelederId: String, lederFnr: String): Ansatt? {
     return connection.use { connection ->
-        connection.prepareStatement(
-            """
+        connection
+            .prepareStatement(
+                """
             select nl.narmeste_leder_id, s.pasient_fnr, s.pasient_navn, nl.orgnummer from narmesteleder as nl
             inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
             where nl.narmeste_leder_id = ? and nl.leder_fnr = ?;
         """,
-        ).use { ps ->
-            ps.setString(1, narmestelederId)
-            ps.setString(2, lederFnr)
-            ps.executeQuery().toAnsatt()
-        }
+            )
+            .use { ps ->
+                ps.setString(1, narmestelederId)
+                ps.setString(2, lederFnr)
+                ps.executeQuery().toAnsatt()
+            }
     }
 }
 
 private fun ResultSet.toAnsatt(): Ansatt? {
     return when (next()) {
         false -> null
-        else -> Ansatt(
-            narmestelederId = getString("narmeste_leder_id"),
-            fnr = getString("pasient_fnr"),
-            orgnummer = getString("orgnummer"),
-            navn = getString("pasient_navn"),
-        )
+        else ->
+            Ansatt(
+                narmestelederId = getString("narmeste_leder_id"),
+                fnr = getString("pasient_fnr"),
+                orgnummer = getString("orgnummer"),
+                navn = getString("pasient_navn"),
+            )
     }
 }
 
@@ -95,13 +100,14 @@ fun DatabaseInterface.insertOrUpdateSykmeldingArbeidsgiver(
 fun DatabaseInterface.deleteSykmelding(key: String) {
     connection.use {
         it.prepareStatement(
-            """
+                """
             DELETE from sykmelding_arbeidsgiver where sykmelding_id = ?
         """,
-        ).use { ps ->
-            ps.setString(1, key)
-            ps.execute()
-        }
+            )
+            .use { ps ->
+                ps.setString(1, key)
+                ps.execute()
+            }
         it.commit()
     }
 }
@@ -111,8 +117,9 @@ private fun insertOrUpdateArbeidsgiverSykmelding(
     sendtSykmeldingKafkaMessage: SykmeldingArbeidsgiverKafkaMessage,
     latestTom: LocalDate,
 ) {
-    connection.prepareStatement(
-        """
+    connection
+        .prepareStatement(
+            """
              INSERT INTO sykmelding_arbeidsgiver(sykmelding_id, pasient_fnr, orgnummer, juridisk_orgnummer, timestamp, latest_tom, orgnavn, sykmelding) 
                     values (?, ?, ?, ?, ?, ?, ?, ?)
                 on conflict (sykmelding_id) do update 
@@ -124,78 +131,89 @@ private fun insertOrUpdateArbeidsgiverSykmelding(
                         orgnavn = ?,
                         sykmelding = ?;
          """,
-    ).use { ps ->
-        val sykmeldingId = sendtSykmeldingKafkaMessage.sykmelding.id
-        val pasientFnr = sendtSykmeldingKafkaMessage.kafkaMetadata.fnr
-        val orgnummer = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.orgnummer
-        val juridiskOrgnummer = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.juridiskOrgnummer
-        val timestamp = Timestamp.from(sendtSykmeldingKafkaMessage.event.timestamp.toInstant())
-        val sykmelding = toPGObject(sendtSykmeldingKafkaMessage.sykmelding)
-        val orgnavn = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.orgNavn
-        val latestDate = Date.valueOf(latestTom)
+        )
+        .use { ps ->
+            val sykmeldingId = sendtSykmeldingKafkaMessage.sykmelding.id
+            val pasientFnr = sendtSykmeldingKafkaMessage.kafkaMetadata.fnr
+            val orgnummer = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.orgnummer
+            val juridiskOrgnummer =
+                sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.juridiskOrgnummer
+            val timestamp = Timestamp.from(sendtSykmeldingKafkaMessage.event.timestamp.toInstant())
+            val sykmelding = toPGObject(sendtSykmeldingKafkaMessage.sykmelding)
+            val orgnavn = sendtSykmeldingKafkaMessage.event.arbeidsgiver!!.orgNavn
+            val latestDate = Date.valueOf(latestTom)
 
-        var index = 1
-        // INSERT
-        ps.setString(index++, sykmeldingId)
-        ps.setString(index++, pasientFnr)
-        ps.setString(index++, orgnummer)
-        ps.setString(index++, juridiskOrgnummer)
-        ps.setTimestamp(index++, timestamp)
-        ps.setDate(index++, latestDate)
-        ps.setString(index++, orgnavn)
-        ps.setObject(index++, sykmelding)
-        // UPDATE
-        ps.setString(index++, pasientFnr)
-        ps.setString(index++, orgnummer)
-        ps.setString(index++, juridiskOrgnummer)
-        ps.setTimestamp(index++, timestamp)
-        ps.setDate(index++, latestDate)
-        ps.setString(index++, orgnavn)
-        ps.setObject(index, sykmelding)
-        ps.execute()
-    }
+            var index = 1
+            // INSERT
+            ps.setString(index++, sykmeldingId)
+            ps.setString(index++, pasientFnr)
+            ps.setString(index++, orgnummer)
+            ps.setString(index++, juridiskOrgnummer)
+            ps.setTimestamp(index++, timestamp)
+            ps.setDate(index++, latestDate)
+            ps.setString(index++, orgnavn)
+            ps.setObject(index++, sykmelding)
+            // UPDATE
+            ps.setString(index++, pasientFnr)
+            ps.setString(index++, orgnummer)
+            ps.setString(index++, juridiskOrgnummer)
+            ps.setTimestamp(index++, timestamp)
+            ps.setDate(index++, latestDate)
+            ps.setString(index++, orgnavn)
+            ps.setObject(index, sykmelding)
+            ps.execute()
+        }
 }
 
 fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String): List<SykmeldingArbeidsgiver> {
     return connection.use { connection ->
-        connection.prepareStatement(
-            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
+        connection
+            .prepareStatement(
+                """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
                         inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
                         inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
                     where nl.leder_fnr = ?;
                 """,
-        ).use { ps ->
-            ps.setString(1, lederFnr)
-            ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
-        }
+            )
+            .use { ps ->
+                ps.setString(1, lederFnr)
+                ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
+            }
     }
 }
 
-fun DatabaseInterface.getArbeidsgiverSykmeldinger(lederFnr: String, narmestelederId: String): List<SykmeldingArbeidsgiver> {
+fun DatabaseInterface.getArbeidsgiverSykmeldinger(
+    lederFnr: String,
+    narmestelederId: String
+): List<SykmeldingArbeidsgiver> {
     return connection.use { connection ->
-        connection.prepareStatement(
-            """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
+        connection
+            .prepareStatement(
+                """select nl.narmeste_leder_id, sa.sykmelding, nl.pasient_fnr, s.pasient_navn, nl.orgnummer, sa.orgnavn from narmesteleder as nl
                     inner join sykmelding_arbeidsgiver as sa on sa.pasient_fnr = nl.pasient_fnr and sa.orgnummer = nl.orgnummer
                     inner join sykmeldt as s on s.pasient_fnr = nl.pasient_fnr
                     where nl.leder_fnr = ?
                        and nl.narmeste_leder_id = ?;
                 """,
-        ).use { ps ->
-            ps.setString(1, lederFnr)
-            ps.setString(2, narmestelederId)
-            ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
-        }
+            )
+            .use { ps ->
+                ps.setString(1, lederFnr)
+                ps.setString(2, narmestelederId)
+                ps.executeQuery().toList { toArbeidsgiverSykmeldingV2() }
+            }
     }
 }
 
-fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult = connection.use { connection ->
-    val result = DeleteResult(
-        deletedSykmelding = deleteSykmeldinger(connection, date),
-        deletedSykmeldt = deleteSykmeldte(connection, date),
-    )
-    connection.commit()
-    return result
-}
+fun DatabaseInterface.deleteSykmeldinger(date: LocalDate): DeleteResult =
+    connection.use { connection ->
+        val result =
+            DeleteResult(
+                deletedSykmelding = deleteSykmeldinger(connection, date),
+                deletedSykmeldt = deleteSykmeldte(connection, date),
+            )
+        connection.commit()
+        return result
+    }
 
 private fun deleteSykmeldte(connection: Connection, date: LocalDate): Int {
     return connection.prepareStatement("""delete from sykmeldt where latest_tom < ?;""").use { ps ->
@@ -205,10 +223,12 @@ private fun deleteSykmeldte(connection: Connection, date: LocalDate): Int {
 }
 
 private fun deleteSykmeldinger(connection: Connection, date: LocalDate): Int {
-    return connection.prepareStatement("""delete from sykmelding_arbeidsgiver where latest_tom < ?;""").use { ps ->
-        ps.setDate(1, Date.valueOf(date))
-        ps.executeUpdate()
-    }
+    return connection
+        .prepareStatement("""delete from sykmelding_arbeidsgiver where latest_tom < ?;""")
+        .use { ps ->
+            ps.setDate(1, Date.valueOf(date))
+            ps.executeUpdate()
+        }
 }
 
 fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiver {
@@ -222,8 +242,9 @@ fun ResultSet.toArbeidsgiverSykmeldingV2(): SykmeldingArbeidsgiver {
     )
 }
 
-fun <T> ResultSet.toList(mapper: ResultSet.() -> T): List<T> = mutableListOf<T>().apply {
-    while (next()) {
-        add(mapper())
+fun <T> ResultSet.toList(mapper: ResultSet.() -> T): List<T> =
+    mutableListOf<T>().apply {
+        while (next()) {
+            add(mapper())
+        }
     }
-}

@@ -1,5 +1,8 @@
 package no.nav.syfo.sykmelding
 
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -15,9 +18,6 @@ import no.nav.syfo.sykmelding.kafka.model.SykmeldingArbeidsgiverKafkaMessage
 import no.nav.syfo.util.Unbounded
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.LoggerFactory
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
 
 class SykmeldingAivenService(
     private val kafkaConsumer: KafkaConsumer<String, SykmeldingArbeidsgiverKafkaMessage?>,
@@ -44,7 +44,10 @@ class SykmeldingAivenService(
                     kafkaConsumer.subscribe(listOf(topic))
                     start()
                 } catch (ex: Exception) {
-                    log.error("Error running sykmelding kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
+                    log.error(
+                        "Error running sykmelding kafka consumer, unsubscribing and waiting 10 seconds for retry",
+                        ex
+                    )
                     kafkaConsumer.unsubscribe()
                     delay(5_000)
                 }
@@ -56,9 +59,7 @@ class SykmeldingAivenService(
         var processedMessages = 0
         while (applicationState.ready) {
             val sykmeldinger = kafkaConsumer.poll(Duration.ofSeconds(POLL_DURATION_SECONDS))
-            sykmeldinger.forEach {
-                handleSykmelding(it.key(), it.value())
-            }
+            sykmeldinger.forEach { handleSykmelding(it.key(), it.value()) }
             processedMessages += sykmeldinger.count()
             processedMessages = logProcessedMessages(processedMessages)
         }
@@ -67,29 +68,45 @@ class SykmeldingAivenService(
     private fun logProcessedMessages(processedMessages: Int): Int {
         val currentLogTime = Instant.now().toEpochMilli()
         if (processedMessages > 0 && currentLogTime - lastLogTime > logTimer) {
-            log.info("Processed $processedMessages messages, ignored sykmeldinger $ignoredSykmeldinger")
+            log.info(
+                "Processed $processedMessages messages, ignored sykmeldinger $ignoredSykmeldinger"
+            )
             lastLogTime = currentLogTime
             return 0
         }
         return processedMessages
     }
 
-    private suspend fun handleSykmelding(sykmeldingId: String, sykmeldingArbeidsgiverKafkaMessage: SykmeldingArbeidsgiverKafkaMessage?) {
+    private suspend fun handleSykmelding(
+        sykmeldingId: String,
+        sykmeldingArbeidsgiverKafkaMessage: SykmeldingArbeidsgiverKafkaMessage?
+    ) {
         if (sykmeldingArbeidsgiverKafkaMessage == null) {
             database.deleteSykmelding(sykmeldingId)
         } else {
-            val latestTom = sykmeldingArbeidsgiverKafkaMessage.sykmelding.sykmeldingsperioder.maxOf { it.tom }
+            val latestTom =
+                sykmeldingArbeidsgiverKafkaMessage.sykmelding.sykmeldingsperioder.maxOf { it.tom }
             if (skalIgnorereSykmelding(latestTom)) {
                 ignoredSykmeldinger += 1
             } else {
                 try {
-                    val person = pdlPersonService.getPerson(fnr = sykmeldingArbeidsgiverKafkaMessage.kafkaMetadata.fnr, callId = sykmeldingId)
-                    database.insertOrUpdateSykmeldingArbeidsgiver(sykmeldingArbeidsgiverKafkaMessage, person, latestTom)
+                    val person =
+                        pdlPersonService.getPerson(
+                            fnr = sykmeldingArbeidsgiverKafkaMessage.kafkaMetadata.fnr,
+                            callId = sykmeldingId
+                        )
+                    database.insertOrUpdateSykmeldingArbeidsgiver(
+                        sykmeldingArbeidsgiverKafkaMessage,
+                        person,
+                        latestTom
+                    )
                 } catch (ex: NameNotFoundInPdlException) {
                     if (cluster != "dev-gcp") {
                         throw ex
                     } else {
-                        log.info("Ignoring sykmelding when person is not found in pdl for sykmelding: $sykmeldingId")
+                        log.info(
+                            "Ignoring sykmelding when person is not found in pdl for sykmelding: $sykmeldingId"
+                        )
                     }
                 }
             }

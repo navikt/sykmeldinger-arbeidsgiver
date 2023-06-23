@@ -15,22 +15,25 @@ class DineSykmeldteService(
 
     fun getDineSykmeldte(fnrLeder: String): List<Sykmeldt> {
         val sykmeldinger = sykmeldingService.getSykmeldinger(fnrLeder)
-        return sykmeldinger.groupBy {
-            Ansatt(
-                fnr = it.pasientFnr,
-                navn = it.navn,
-                orgnummer = it.orgnummer,
-                narmestelederId = it.narmestelederId,
-            )
-        }.map { ansatt ->
-            Sykmeldt(
-                narmestelederId = ansatt.key.narmestelederId,
-                orgnummer = ansatt.key.orgnummer,
-                fnr = ansatt.key.fnr,
-                ansatt.key.navn,
-                sykmeldinger = ansatt.value.map { it.toDineSykmeldteSykmelding(ansatt.key) },
-                aktivSykmelding = ansatt.value.any { it.sykmelding.sykmeldingsperioder.isActive() },
-            )
-        }
+        return sykmeldinger
+            .groupBy {
+                Ansatt(
+                    fnr = it.pasientFnr,
+                    navn = it.navn,
+                    orgnummer = it.orgnummer,
+                    narmestelederId = it.narmestelederId,
+                )
+            }
+            .map { ansatt ->
+                Sykmeldt(
+                    narmestelederId = ansatt.key.narmestelederId,
+                    orgnummer = ansatt.key.orgnummer,
+                    fnr = ansatt.key.fnr,
+                    ansatt.key.navn,
+                    sykmeldinger = ansatt.value.map { it.toDineSykmeldteSykmelding(ansatt.key) },
+                    aktivSykmelding =
+                        ansatt.value.any { it.sykmelding.sykmeldingsperioder.isActive() },
+                )
+            }
     }
 }

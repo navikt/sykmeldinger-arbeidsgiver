@@ -22,6 +22,7 @@ import io.ktor.server.testing.handleRequest
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import java.nio.file.Paths
 import no.nav.syfo.Environment
 import no.nav.syfo.application.setupAuth
 import no.nav.syfo.dinesykmeldte.model.Sykmeldt
@@ -30,130 +31,138 @@ import no.nav.syfo.log
 import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
 import testutil.generateJWTLoginservice
-import java.nio.file.Paths
 
-class DineSykmeldteApiKtTest : FunSpec({
+class DineSykmeldteApiKtTest :
+    FunSpec({
+        val path = "src/test/resources/jwkset.json"
+        val uri = Paths.get(path).toUri().toURL()
+        val jwkProvider = JwkProviderBuilder(uri).build()
+        val env =
+            mockk<Environment>() {
+                every { loginserviceIdportenAudience } returns listOf("loginService")
+            }
+        val dineSykmeldteService = mockk<DineSykmeldteService>()
 
-    val path = "src/test/resources/jwkset.json"
-    val uri = Paths.get(path).toUri().toURL()
-    val jwkProvider = JwkProviderBuilder(uri).build()
-    val env = mockk<Environment>() {
-        every { loginserviceIdportenAudience } returns listOf("loginService")
-    }
-    val dineSykmeldteService = mockk<DineSykmeldteService>()
+        context("Test av Dine Sykmeldte API") {
+            with(TestApplicationEngine()) {
+                start()
 
-    context("Test av Dine Sykmeldte API") {
+                application.setupAuth(
+                    env = env,
+                    jwkProviderLoginservice = jwkProvider,
+                    loginserviceIssuer = "iss",
+                    jwkProviderTokenX = jwkProvider,
+                    tokenXIssuer = "tokendings",
+                )
 
-        with(TestApplicationEngine()) {
-            start()
+                application.routing {
+                    authenticate("loginservice") {
+                        route("/api") { registerDineSykmeldteApi(dineSykmeldteService) }
+                    }
+                }
 
-            application.setupAuth(
-                env = env,
-                jwkProviderLoginservice = jwkProvider,
-                loginserviceIssuer = "iss",
-                jwkProviderTokenX = jwkProvider,
-                tokenXIssuer = "tokendings",
-            )
+                application.install(ContentNegotiation) {
+                    jackson {
+                        registerKotlinModule()
+                        registerModule(JavaTimeModule())
+                        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                    }
+                }
+                application.install(StatusPages) {
+                    exception<Throwable> { call, cause ->
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            cause.message ?: "Unknown error"
+                        )
+                        log.error("Caught exception", cause)
+                        throw cause
+                    }
+                }
 
-            application.routing {
-                authenticate("loginservice") {
-                    route("/api") {
-                        registerDineSykmeldteApi(dineSykmeldteService)
+                test("Skal returnere sykmeldt") {
+                    coEvery { dineSykmeldteService.getDineSykmeldte(any()) } returns
+                        listOf(
+                            Sykmeldt(
+                                "lederId",
+                                "orgnr",
+                                "fnr",
+                                "Navn Navnesen",
+                                null,
+                                aktivSykmelding = true,
+                            ),
+                        )
+                    with(
+                        handleRequest(HttpMethod.Get, "api/dinesykmeldte") {
+                            addHeader("Accept", "application/json")
+                            addHeader("Content-Type", "application/json")
+                            addHeader(
+                                HttpHeaders.Authorization,
+                                "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}"
+                            )
+                        },
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                        val sykmeldt = objectMapper.readValue<List<Sykmeldt>>(response.content!!)
+
+                        sykmeldt shouldBeEqualTo
+                            listOf(
+                                Sykmeldt(
+                                    "lederId",
+                                    "orgnr",
+                                    "fnr",
+                                    "Navn Navnesen",
+                                    null,
+                                    aktivSykmelding = true,
+                                ),
+                            )
+                    }
+                }
+
+                test("Skal returnere sykmeldt") {
+                    coEvery { dineSykmeldteService.getSykmeldt(any(), any()) } returns
+                        Sykmeldt(
+                            "lederId",
+                            "orgnr",
+                            "fnr",
+                            "Navn Navnesen",
+                            null,
+                            aktivSykmelding = true,
+                        )
+                    with(
+                        handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
+                            addHeader("Accept", "application/json")
+                            addHeader("Content-Type", "application/json")
+                            addHeader(
+                                HttpHeaders.Authorization,
+                                "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}"
+                            )
+                        },
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.OK
+                        val sykmeldt = objectMapper.readValue<Sykmeldt>(response.content!!)
+
+                        sykmeldt shouldBeEqualTo
+                            Sykmeldt(
+                                "lederId",
+                                "orgnr",
+                                "fnr",
+                                "Navn Navnesen",
+                                null,
+                                aktivSykmelding = true,
+                            )
+                    }
+                }
+
+                test("Skal returnere 401 Unauthorized hvis auth header mangler") {
+                    with(
+                        handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
+                            addHeader("Accept", "application/json")
+                            addHeader("Content-Type", "application/json")
+                        },
+                    ) {
+                        response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
                     }
                 }
             }
-
-            application.install(ContentNegotiation) {
-                jackson {
-                    registerKotlinModule()
-                    registerModule(JavaTimeModule())
-                    configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                }
-            }
-            application.install(StatusPages) {
-                exception<Throwable> { call, cause ->
-                    call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
-                    log.error("Caught exception", cause)
-                    throw cause
-                }
-            }
-
-            test("Skal returnere sykmeldt") {
-                coEvery { dineSykmeldteService.getDineSykmeldte(any()) } returns
-                    listOf(
-                        Sykmeldt(
-                            "lederId",
-                            "orgnr",
-                            "fnr",
-                            "Navn Navnesen",
-                            null,
-                            aktivSykmelding = true,
-                        ),
-                    )
-                with(
-                    handleRequest(HttpMethod.Get, "api/dinesykmeldte") {
-                        addHeader("Accept", "application/json")
-                        addHeader("Content-Type", "application/json")
-                        addHeader(HttpHeaders.Authorization, "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}")
-                    },
-                ) {
-                    response.status() shouldBeEqualTo HttpStatusCode.OK
-                    val sykmeldt = objectMapper.readValue<List<Sykmeldt>>(response.content!!)
-
-                    sykmeldt shouldBeEqualTo listOf(
-                        Sykmeldt(
-                            "lederId",
-                            "orgnr",
-                            "fnr",
-                            "Navn Navnesen",
-                            null,
-                            aktivSykmelding = true,
-                        ),
-                    )
-                }
-            }
-
-            test("Skal returnere sykmeldt") {
-                coEvery { dineSykmeldteService.getSykmeldt(any(), any()) } returns
-                    Sykmeldt(
-                        "lederId",
-                        "orgnr",
-                        "fnr",
-                        "Navn Navnesen",
-                        null,
-                        aktivSykmelding = true,
-                    )
-                with(
-                    handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
-                        addHeader("Accept", "application/json")
-                        addHeader("Content-Type", "application/json")
-                        addHeader(HttpHeaders.Authorization, "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}")
-                    },
-                ) {
-                    response.status() shouldBeEqualTo HttpStatusCode.OK
-                    val sykmeldt = objectMapper.readValue<Sykmeldt>(response.content!!)
-
-                    sykmeldt shouldBeEqualTo Sykmeldt(
-                        "lederId",
-                        "orgnr",
-                        "fnr",
-                        "Navn Navnesen",
-                        null,
-                        aktivSykmelding = true,
-                    )
-                }
-            }
-
-            test("Skal returnere 401 Unauthorized hvis auth header mangler") {
-                with(
-                    handleRequest(HttpMethod.Get, "api/dinesykmeldte/lederId") {
-                        addHeader("Accept", "application/json")
-                        addHeader("Content-Type", "application/json")
-                    },
-                ) {
-                    response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
-                }
-            }
         }
-    }
-})
+    })

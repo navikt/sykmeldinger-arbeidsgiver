@@ -1,5 +1,6 @@
 package no.nav.syfo.dinesykmeldte.util
 
+import java.time.LocalDate
 import no.nav.syfo.dinesykmeldte.model.Arbeidsevne
 import no.nav.syfo.dinesykmeldte.model.Bekreftelse
 import no.nav.syfo.dinesykmeldte.model.DineSykmeldteSykmelding
@@ -11,35 +12,40 @@ import no.nav.syfo.model.sykmelding.arbeidsgiver.BehandlerAGDTO
 import no.nav.syfo.model.sykmelding.arbeidsgiver.SykmeldingsperiodeAGDTO
 import no.nav.syfo.narmesteleder.model.Ansatt
 import no.nav.syfo.sykmelding.model.SykmeldingArbeidsgiver
-import java.time.LocalDate
 
 fun SykmeldingArbeidsgiver.toDineSykmeldteSykmelding(ansatt: Ansatt): DineSykmeldteSykmelding {
     return DineSykmeldteSykmelding(
-        pasient = Pasient(
-            fnr = pasientFnr,
-            navn = ansatt.navn,
-        ),
+        pasient =
+            Pasient(
+                fnr = pasientFnr,
+                navn = ansatt.navn,
+            ),
         sykmeldingId = sykmelding.id,
-        mulighetForArbeid = MulighetForArbeid(
-            perioder = getPerioder(),
-            aktivitetIkkeMulig434 = getAktivitetIkkeMulig(this.sykmelding.sykmeldingsperioder),
-            aarsakAktivitetIkkeMulig434 = getAktivitetIkkeMuligBeskrivelse(this.sykmelding.sykmeldingsperioder),
-        ),
+        mulighetForArbeid =
+            MulighetForArbeid(
+                perioder = getPerioder(),
+                aktivitetIkkeMulig434 = getAktivitetIkkeMulig(this.sykmelding.sykmeldingsperioder),
+                aarsakAktivitetIkkeMulig434 =
+                    getAktivitetIkkeMuligBeskrivelse(this.sykmelding.sykmeldingsperioder),
+            ),
         skalViseSkravertFelt = true,
         arbeidsgiver = this.orgNavn,
         innspillTilArbeidsgiver = this.sykmelding.meldingTilArbeidsgiver,
-        arbeidsevne = Arbeidsevne(
-            tilretteleggingArbeidsplass = this.sykmelding.tiltakArbeidsplassen,
-        ),
-        bekreftelse = Bekreftelse(
-            sykmelder = this.sykmelding.behandler?.let { getSykmelderNavn(it) } ?: "",
-            utstedelsesdato = this.sykmelding.behandletTidspunkt.toLocalDate(),
-            sykmelderTlf = this.sykmelding.behandler?.tlf,
-        ),
-        friskmelding = Friskmelding(
-            arbeidsfoerEtterPerioden = this.sykmelding.prognose?.arbeidsforEtterPeriode,
-            hensynPaaArbeidsplassen = this.sykmelding.prognose?.hensynArbeidsplassen,
-        ),
+        arbeidsevne =
+            Arbeidsevne(
+                tilretteleggingArbeidsplass = this.sykmelding.tiltakArbeidsplassen,
+            ),
+        bekreftelse =
+            Bekreftelse(
+                sykmelder = this.sykmelding.behandler?.let { getSykmelderNavn(it) } ?: "",
+                utstedelsesdato = this.sykmelding.behandletTidspunkt.toLocalDate(),
+                sykmelderTlf = this.sykmelding.behandler?.tlf,
+            ),
+        friskmelding =
+            Friskmelding(
+                arbeidsfoerEtterPerioden = this.sykmelding.prognose?.arbeidsforEtterPeriode,
+                hensynPaaArbeidsplassen = this.sykmelding.prognose?.hensynArbeidsplassen,
+            ),
     )
 }
 
@@ -47,23 +53,35 @@ fun getSykmelderNavn(behandlerDTO: BehandlerAGDTO): String {
     return if (behandlerDTO.mellomnavn.isNullOrEmpty()) {
         capitalizeFirstLetter("${behandlerDTO.fornavn} ${behandlerDTO.etternavn}")
     } else {
-        capitalizeFirstLetter("${behandlerDTO.fornavn} ${behandlerDTO.mellomnavn} ${behandlerDTO.etternavn}")
+        capitalizeFirstLetter(
+            "${behandlerDTO.fornavn} ${behandlerDTO.mellomnavn} ${behandlerDTO.etternavn}"
+        )
     }
 }
 
 fun capitalizeFirstLetter(string: String): String {
-    return string.lowercase()
-        .split(" ").joinToString(" ") { it.replaceFirstChar { char -> char.titlecaseChar() } }
-        .split("-").joinToString("-") { it.replaceFirstChar { char -> char.titlecaseChar() } }
+    return string
+        .lowercase()
+        .split(" ")
+        .joinToString(" ") { it.replaceFirstChar { char -> char.titlecaseChar() } }
+        .split("-")
+        .joinToString("-") { it.replaceFirstChar { char -> char.titlecaseChar() } }
         .trimEnd()
 }
 
 fun getAktivitetIkkeMuligBeskrivelse(sykmeldingsperioder: List<SykmeldingsperiodeAGDTO>): String {
-    return sykmeldingsperioder.mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak?.beskrivelse }.distinct().joinToString(separator = ", ")
+    return sykmeldingsperioder
+        .mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak?.beskrivelse }
+        .distinct()
+        .joinToString(separator = ", ")
 }
 
 fun getAktivitetIkkeMulig(sykmeldingsperioder: List<SykmeldingsperiodeAGDTO>): List<String> {
-    return sykmeldingsperioder.mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak }.flatMap { it.arsak }.map { it.name }.distinct()
+    return sykmeldingsperioder
+        .mapNotNull { it.aktivitetIkkeMulig?.arbeidsrelatertArsak }
+        .flatMap { it.arsak }
+        .map { it.name }
+        .distinct()
 }
 
 private fun SykmeldingArbeidsgiver.getPerioder(): List<Periode> {
@@ -82,7 +100,5 @@ private fun SykmeldingsperiodeAGDTO.toPerioder(): Periode {
 }
 
 fun List<SykmeldingsperiodeAGDTO>.isActive(date: LocalDate = LocalDate.now()): Boolean {
-    return any {
-        !it.fom.isAfter(date) && !date.isAfter(it.tom)
-    }
+    return any { !it.fom.isAfter(date) && !date.isAfter(it.tom) }
 }

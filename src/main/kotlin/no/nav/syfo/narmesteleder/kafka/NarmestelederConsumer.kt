@@ -1,5 +1,6 @@
 package no.nav.syfo.narmesteleder.kafka
 
+import java.time.Duration
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -12,7 +13,6 @@ import no.nav.syfo.narmesteleder.kafka.model.Narmesteleder
 import no.nav.syfo.util.Unbounded
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.LoggerFactory
-import java.time.Duration
 
 class NarmestelederConsumer(
     private val narmestelederDB: NarmestelederDB,
@@ -32,7 +32,10 @@ class NarmestelederConsumer(
                 try {
                     start()
                 } catch (ex: Exception) {
-                    log.error("Error running narmesteleder kafka consumer, unsubscribing and waiting 10 seconds for retry", ex)
+                    log.error(
+                        "Error running narmesteleder kafka consumer, unsubscribing and waiting 10 seconds for retry",
+                        ex
+                    )
                     kafkaConsumer.unsubscribe()
                     delay(5_000)
                 }
@@ -43,12 +46,15 @@ class NarmestelederConsumer(
     private fun start() {
         kafkaConsumer.subscribe(listOf(narmestelederTopic))
         while (applicationState.ready) {
-            kafkaConsumer.poll(Duration.ofSeconds(POLL_DURATION_SECONDS)).map { it.value() }.forEach {
-                when (it.aktivTom) {
-                    null -> narmestelederDB.insertOrUpdate(it)
-                    else -> narmestelederDB.deleteNarmesteleder(it)
+            kafkaConsumer
+                .poll(Duration.ofSeconds(POLL_DURATION_SECONDS))
+                .map { it.value() }
+                .forEach {
+                    when (it.aktivTom) {
+                        null -> narmestelederDB.insertOrUpdate(it)
+                        else -> narmestelederDB.deleteNarmesteleder(it)
+                    }
                 }
-            }
         }
     }
 }

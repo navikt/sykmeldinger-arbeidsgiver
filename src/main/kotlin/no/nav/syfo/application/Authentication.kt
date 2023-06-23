@@ -33,7 +33,10 @@ fun Application.setupAuth(
             verifier(jwkProviderLoginservice, loginserviceIssuer)
             validate { credentials ->
                 when {
-                    hasLoginserviceIdportenClientIdAudience(credentials, env.loginserviceIdportenAudience) && erNiva4(credentials) -> {
+                    hasLoginserviceIdportenClientIdAudience(
+                        credentials,
+                        env.loginserviceIdportenAudience
+                    ) && erNiva4(credentials) -> {
                         val principal = JWTPrincipal(credentials.payload)
                         BrukerPrincipal(
                             fnr = finnFnrFraToken(principal),
@@ -54,14 +57,14 @@ fun Application.setupAuth(
             verifier(jwkProviderTokenX, tokenXIssuer)
             validate { credentials ->
                 when {
-                    hasClientIdAudience(credentials, env.clientIdTokenX) && erNiva4(credentials) ->
-                        {
-                            val principal = JWTPrincipal(credentials.payload)
-                            BrukerPrincipal(
-                                fnr = finnFnrFraToken(principal),
-                                principal = principal,
-                            )
-                        }
+                    hasClientIdAudience(credentials, env.clientIdTokenX) &&
+                        erNiva4(credentials) -> {
+                        val principal = JWTPrincipal(credentials.payload)
+                        BrukerPrincipal(
+                            fnr = finnFnrFraToken(principal),
+                            principal = principal,
+                        )
+                    }
                     else -> unauthorized(credentials)
                 }
             }
@@ -75,6 +78,7 @@ fun ApplicationCall.getToken(): String? {
     }
     return request.cookies.get(name = "selvbetjening-idtoken")
 }
+
 fun unauthorized(credentials: JWTCredential): Principal? {
     log.warn(
         "Auth: Unexpected audience for jwt {}, {}",
@@ -84,7 +88,10 @@ fun unauthorized(credentials: JWTCredential): Principal? {
     return null
 }
 
-fun hasLoginserviceIdportenClientIdAudience(credentials: JWTCredential, loginserviceIdportenClientId: List<String>): Boolean {
+fun hasLoginserviceIdportenClientIdAudience(
+    credentials: JWTCredential,
+    loginserviceIdportenClientId: List<String>
+): Boolean {
     return loginserviceIdportenClientId.any { credentials.payload.audience.contains(it) }
 }
 
@@ -97,7 +104,10 @@ fun erNiva4(credentials: JWTCredential): Boolean {
 }
 
 fun finnFnrFraToken(principal: JWTPrincipal): String {
-    return if (principal.payload.getClaim("pid") != null && !principal.payload.getClaim("pid").asString().isNullOrEmpty()) {
+    return if (
+        principal.payload.getClaim("pid") != null &&
+            !principal.payload.getClaim("pid").asString().isNullOrEmpty()
+    ) {
         log.debug("Bruker fnr fra pid-claim")
         principal.payload.getClaim("pid").asString()
     } else {
