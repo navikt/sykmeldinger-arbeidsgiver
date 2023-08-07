@@ -21,7 +21,7 @@ val flywayVersion = "9.21.1"
 val postgresVersion = "42.6.0"
 val testContainerVersion = "1.18.3"
 val kotlinVersion = "1.9.0"
-val swaggerUiVersion = "5.2.0"
+val swaggerUiVersion = "5.3.1"
 val commonsCodecVersion = "1.16.0"
 val ktfmtVersion = "0.44"
 
