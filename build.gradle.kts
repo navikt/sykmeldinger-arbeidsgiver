@@ -111,10 +111,6 @@ tasks {
         println(project.version)
     }
 
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-        dependsOn("generateSwaggerUI")
-    }
     withType<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
         outputDir = File(buildDir.path + "/resources/main/api")
     }
