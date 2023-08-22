@@ -58,9 +58,6 @@ spec:
     requests:
       cpu: 100m
       memory: 1Gi
-  ingresses:
-    - "https://sykmeldinger-arbeidsgiver.nav.no"
-    - "https://sykmeldinger-arbeidsgiver.intern.nav.no"
   kafka:
     pool: nav-prod
   tokenx:
