@@ -19,14 +19,14 @@ const val keyId = "localhost-signer"
 /* Utsteder en Bearer-token (En slik vi ber AzureAd om). OBS: Det er viktig at KeyId matcher kid i jwkset.json
  */
 
-fun generateJWTLoginservice(
-    consumerClientId: String = "client",
+fun generateJWT(
+    consumerClientId: String,
     audience: String,
     expiry: LocalDateTime? = LocalDateTime.now().plusHours(1),
     subject: String = "subject",
-    issuer: String = "iss",
+    issuer: String = "https://sts.issuer.net/myid",
     level: String = "Level4",
-): String {
+): String? {
     val now = Date()
     val key = getDefaultRSAKey()
     val alg = Algorithm.RSA256(key.toRSAPublicKey(), key.toRSAPrivateKey())
@@ -48,7 +48,7 @@ fun generateJWTLoginservice(
         .sign(alg)
 }
 
-private fun getDefaultRSAKey(): RSAKey {
+fun getDefaultRSAKey(): RSAKey {
     return getJWKSet().getKeyByKeyId(keyId) as RSAKey
 }
 
