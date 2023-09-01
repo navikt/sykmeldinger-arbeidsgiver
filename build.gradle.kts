@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -76,6 +75,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
+    implementation("io.ktor:ktor-server-swagger:$ktorVersion")
+
     swaggerUI("org.webjars:swagger-ui:$swaggerUiVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
@@ -100,19 +101,11 @@ dependencies {
         exclude(group = "org.eclipse.jetty")
     }
 }
-swaggerSources {
-    create("sykmeldinger-arbeidsgiver").apply {
-        setInputFile(file("api/oas3/sykmeldinger-arbeidsgiver-api.yaml"))
-    }
-}
+
 
 tasks {
     create("printVersion") {
         println(project.version)
-    }
-
-    withType<org.hidetake.gradle.swagger.generator.GenerateSwaggerUI> {
-        outputDir = File(buildDir.path + "/resources/main/api")
     }
 
     withType<ShadowJar> {

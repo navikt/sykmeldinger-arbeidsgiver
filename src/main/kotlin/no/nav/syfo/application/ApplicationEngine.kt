@@ -20,13 +20,13 @@ import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.respond
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import java.util.UUID
 import no.nav.syfo.Environment
 import no.nav.syfo.application.api.registerNaisApi
-import no.nav.syfo.application.api.setupSwaggerDocApi
 import no.nav.syfo.application.metrics.monitorHttpRequests
 import no.nav.syfo.dinesykmeldte.api.registerDineSykmeldteApi
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
@@ -36,8 +36,6 @@ fun createApplicationEngine(
     env: Environment,
     applicationState: ApplicationState,
     dineSykmeldteService: DineSykmeldteService,
-    jwkProvider: JwkProvider,
-    loginserviceIssuer: String,
     jwkProviderTokenX: JwkProvider,
     tokenXIssuer: String,
 ): ApplicationEngine =
@@ -60,9 +58,7 @@ fun createApplicationEngine(
         }
 
         setupAuth(
-            jwkProviderLoginservice = jwkProvider,
             env = env,
-            loginserviceIssuer = loginserviceIssuer,
             jwkProviderTokenX = jwkProviderTokenX,
             tokenXIssuer = tokenXIssuer,
         )
@@ -89,13 +85,12 @@ fun createApplicationEngine(
         routing {
             registerNaisApi(applicationState)
             if (env.cluster == "dev-gcp") {
-                setupSwaggerDocApi()
+                swaggerUI(path = "docs", swaggerFile = "openapi/sykmeldinger-arbeidsgiver-api.yaml")
             }
-            authenticate("loginservice") {
-                route("/api") { registerDineSykmeldteApi(dineSykmeldteService) }
-            }
+
             authenticate("tokenx") {
                 route("/api/v2") { registerDineSykmeldteApi(dineSykmeldteService) }
+                route("/api") { registerDineSykmeldteApi(dineSykmeldteService) }
             }
         }
         intercept(ApplicationCallPipeline.Monitoring, monitorHttpRequests())

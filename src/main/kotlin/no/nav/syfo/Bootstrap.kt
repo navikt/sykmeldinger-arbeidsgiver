@@ -94,13 +94,6 @@ fun main() {
     }
     val httpClient = HttpClient(Apache, config)
 
-    val wellKnown = getWellKnown(httpClient, env.loginserviceIdportenDiscoveryUrl)
-    val jwkProviderLoginservice =
-        JwkProviderBuilder(URL(wellKnown.jwks_uri))
-            .cached(10, 24, TimeUnit.HOURS)
-            .rateLimited(10, 1, TimeUnit.MINUTES)
-            .build()
-
     val wellKnownTokenX = getWellKnownTokenX(httpClient, env.tokenXWellKnownUrl)
     val jwkProviderTokenX =
         JwkProviderBuilder(URL(wellKnownTokenX.jwks_uri))
@@ -116,8 +109,6 @@ fun main() {
         createApplicationEngine(
             env,
             applicationState,
-            jwkProvider = jwkProviderLoginservice,
-            loginserviceIssuer = wellKnown.issuer,
             dineSykmeldteService = dineSykmeldteService,
             jwkProviderTokenX = jwkProviderTokenX,
             tokenXIssuer = wellKnownTokenX.issuer,

@@ -20,7 +20,6 @@ import io.ktor.server.routing.routing
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import java.nio.file.Paths
 import no.nav.syfo.Environment
@@ -30,7 +29,8 @@ import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
 import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
-import testutil.generateJWTLoginservice
+import testutil.generateJWT
+import testutil.getDefaultRSAKey
 
 class DineSykmeldteApiKtTest :
     FunSpec({
@@ -38,9 +38,24 @@ class DineSykmeldteApiKtTest :
         val uri = Paths.get(path).toUri().toURL()
         val jwkProvider = JwkProviderBuilder(uri).build()
         val env =
-            mockk<Environment>() {
-                every { loginserviceIdportenAudience } returns listOf("loginService")
-            }
+            Environment(
+                cluster = "dev-gcp",
+                tokenXWellKnownUrl = "https://tokenx",
+                clientIdTokenX = "clientId",
+                tokenXPrivateJwk = getDefaultRSAKey(),
+                allowedOrigin = emptyList(),
+                dbHost = "",
+                dbPort = "",
+                dbName = "",
+                databasePassword = "",
+                databaseUsername = "",
+                pdlScope = "",
+                pdlGraphqlPath = "",
+                aadAccessTokenUrl = "",
+                clientId = "",
+                clientSecret = "",
+                electorPath = "",
+            )
         val dineSykmeldteService = mockk<DineSykmeldteService>()
 
         context("Test av Dine Sykmeldte API") {
@@ -49,14 +64,12 @@ class DineSykmeldteApiKtTest :
 
                 application.setupAuth(
                     env = env,
-                    jwkProviderLoginservice = jwkProvider,
-                    loginserviceIssuer = "iss",
                     jwkProviderTokenX = jwkProvider,
-                    tokenXIssuer = "tokendings",
+                    tokenXIssuer = "issuer",
                 )
 
                 application.routing {
-                    authenticate("loginservice") {
+                    authenticate("tokenx") {
                         route("/api") { registerDineSykmeldteApi(dineSykmeldteService) }
                     }
                 }
@@ -97,7 +110,8 @@ class DineSykmeldteApiKtTest :
                             addHeader("Content-Type", "application/json")
                             addHeader(
                                 HttpHeaders.Authorization,
-                                "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}"
+                                "Bearer ${generateJWT("client",
+                                    "clientId", subject = "12345678912", issuer = "issuer")}"
                             )
                         },
                     ) {
@@ -134,7 +148,8 @@ class DineSykmeldteApiKtTest :
                             addHeader("Content-Type", "application/json")
                             addHeader(
                                 HttpHeaders.Authorization,
-                                "Bearer ${generateJWTLoginservice("2", env.loginserviceIdportenAudience.first(), subject = "12345678912")}"
+                                "Bearer ${generateJWT("client",
+                                    "clientId", subject = "12345678912", issuer = "issuer")}"
                             )
                         },
                     ) {
