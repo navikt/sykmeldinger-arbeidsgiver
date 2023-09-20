@@ -60,7 +60,6 @@ spec:
       memory: 500Mi
   ingresses:
     - "https://sykmeldinger-arbeidsgiver.intern.dev.nav.no"
-    - "https://sykmeldinger-arbeidsgiver.dev.nav.no"
   kafka:
     pool: nav-dev
   tokenx:
