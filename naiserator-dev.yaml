@@ -59,7 +59,7 @@ spec:
       cpu: 50m
       memory: 500Mi
   ingresses:
-    - "https://sykmeldinger-arbeidsgiver.dev.intern.nav.no"
+    - "https://sykmeldinger-arbeidsgiver.intern.dev.nav.no"
     - "https://sykmeldinger-arbeidsgiver.dev.nav.no"
   kafka:
     pool: nav-dev
