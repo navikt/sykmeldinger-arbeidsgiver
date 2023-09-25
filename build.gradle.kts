@@ -33,21 +33,12 @@ plugins {
     kotlin("jvm") version "1.9.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
-    id("org.cyclonedx.bom") version "1.7.4"
 }
-
-
-val githubUser: String by project
-val githubPassword: String by project
 
 repositories {
     mavenCentral()
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/syfosm-common")
-        credentials {
-            username = githubUser
-            password = githubPassword
-        }
+        url = uri("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
     }
 }
 
