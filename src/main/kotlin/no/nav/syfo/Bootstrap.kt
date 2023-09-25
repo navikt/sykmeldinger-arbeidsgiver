@@ -117,7 +117,7 @@ fun main() {
 
     val aivenKafkaConsumer =
         KafkaConsumer(
-            KafkaUtils.getAivenKafkaConfig()
+            KafkaUtils.getAivenKafkaConfig("sykmeldinger-consumer")
                 .also {
                     it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
                     it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
@@ -153,7 +153,7 @@ fun main() {
 
     val aivenKafkaSykmeldingConsumer =
         KafkaConsumer(
-            KafkaUtils.getAivenKafkaConfig()
+            KafkaUtils.getAivenKafkaConfig("aiven-sykmeldiger-consumer)
                 .also {
                     it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "100"
                     it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
