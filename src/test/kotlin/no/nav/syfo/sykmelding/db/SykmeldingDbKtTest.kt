@@ -416,5 +416,6 @@ fun getArbeidsgiverSykmelding(
         harRedusertArbeidsgiverperiode = false,
         merknader = emptyList(),
         utenlandskSykmelding = null,
+        signaturDato = null,
     )
 }
