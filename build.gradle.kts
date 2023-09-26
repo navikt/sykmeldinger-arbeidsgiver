@@ -23,7 +23,7 @@ val kotlinVersion = "1.9.10"
 val swaggerUiVersion = "5.7.2"
 val commonsCodecVersion = "1.16.0"
 val ktfmtVersion = "0.44"
-val snakeYamlVersion = "1.31"
+val snakeYamlVersion = "2.0"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
