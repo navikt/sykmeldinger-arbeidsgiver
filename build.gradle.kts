@@ -23,6 +23,7 @@ val kotlinVersion = "1.9.10"
 val swaggerUiVersion = "5.7.2"
 val commonsCodecVersion = "1.16.0"
 val ktfmtVersion = "0.44"
+val snakeYamlVersion = "1.31"
 
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
@@ -81,6 +82,7 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresVersion")
 
     implementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
+    implementation("org.yaml:snakeyaml:$snakeYamlVersion")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
