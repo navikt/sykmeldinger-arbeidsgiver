@@ -1,6 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-
 group = "no.nav.syfo"
 version = "1.0.0"
 
@@ -24,16 +21,18 @@ val swaggerUiVersion = "5.7.2"
 val commonsCodecVersion = "1.16.0"
 val ktfmtVersion = "0.44"
 val snakeYamlVersion = "2.0"
-
-tasks.withType<Jar> {
-    manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
-}
+val snappyJavaVersion = "1.1.10.4"
 
 plugins {
+    id("application")
     id("com.diffplug.spotless") version "6.21.0"
     kotlin("jvm") version "1.9.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
+}
+
+application {
+    mainClass.set("no.nav.syfo.BootstrapKt")
 }
 
 repositories {
@@ -61,11 +60,19 @@ dependencies {
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
-    // override transient version 1.13 from io.ktor:ktor-client-apache
-    implementation("commons-codec:commons-codec:$commonsCodecVersion")
+    constraints {
+        implementation("commons-codec:commons-codec:$commonsCodecVersion") {
+            because("override transient from io.ktor:ktor-client-apache")
+        }
+    }
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
     implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
+    constraints {
+        implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion") {
+            because("override transient from org.apache.kafka:kafka_2.12")
+        }
+    }
     implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
     implementation("io.ktor:ktor-server-swagger:$ktorVersion")
 
@@ -81,15 +88,21 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
 
-    implementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
-    implementation("org.yaml:snakeyaml:$snakeYamlVersion")
+
+    constraints {
+        implementation("org.yaml:snakeyaml:$snakeYamlVersion") {
+            because("override transient version")
+        }
+    }
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.testcontainers:postgresql:$testContainerVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
+    testImplementation("com.nimbusds:nimbus-jose-jwt:$nimbusdsVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
@@ -97,18 +110,21 @@ dependencies {
 
 
 tasks {
-    create("printVersion") {
-        println(project.version)
-    }
 
-    withType<ShadowJar> {
-        transform(ServiceFileTransformer::class.java) {
-            setPath("META-INF/cxf")
-            include("bus-extensions.txt")
+    shadowJar {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        isZip64 = true
+        manifest {
+            attributes(
+                mapOf(
+                    "Main-Class" to "no.nav.syfo.BootstrapKt",
+                ),
+            )
         }
     }
 
-    withType<Test> {
+    test {
         useJUnitPlatform {
         }
         testLogging {

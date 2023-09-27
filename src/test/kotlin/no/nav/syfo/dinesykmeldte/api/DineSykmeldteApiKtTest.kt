@@ -30,7 +30,6 @@ import no.nav.syfo.log
 import no.nav.syfo.util.objectMapper
 import org.amshove.kluent.shouldBeEqualTo
 import testutil.generateJWT
-import testutil.getDefaultRSAKey
 
 class DineSykmeldteApiKtTest :
     FunSpec({
@@ -42,7 +41,6 @@ class DineSykmeldteApiKtTest :
                 cluster = "dev-gcp",
                 tokenXWellKnownUrl = "https://tokenx",
                 clientIdTokenX = "clientId",
-                tokenXPrivateJwk = getDefaultRSAKey(),
                 allowedOrigin = emptyList(),
                 dbHost = "",
                 dbPort = "",
