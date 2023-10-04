@@ -20,6 +20,9 @@ spec:
         - application: dialogmote-frontend
           namespace: team-esyfo
           cluster: prod-gcp
+        - application: syfobrukertilgang
+          namespace: team-esyfo
+          cluster: prod-gcp
   image: {{ image }}
   gcp:
     sqlInstances:
