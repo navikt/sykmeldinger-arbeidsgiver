@@ -69,6 +69,8 @@ spec:
       enabled: true
       tenant: trygdeetaten.no
   leaderElection: true
+  secureLogs:
+    enabled: true
   envFrom:
     - secret: sykmeldinger-arbeidsgiver-secrets
   env:

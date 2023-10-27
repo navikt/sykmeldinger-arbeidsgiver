@@ -9,11 +9,13 @@ import io.ktor.server.routing.get
 import no.nav.syfo.application.BrukerPrincipal
 import no.nav.syfo.dinesykmeldte.service.DineSykmeldteService
 import no.nav.syfo.log
+import no.nav.syfo.securelog
 
 fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
     get("/dinesykmeldte") {
         val principal: BrukerPrincipal = call.authentication.principal()!!
         val fnr = principal.fnr
+        securelog.info("Mottak kall mot /api/v2/dinesykmeldte for fnr: $fnr")
         val sykmeldte = dineSykmeldteService.getDineSykmeldte(fnr)
         log.info("Hentet ${sykmeldte.size} fra db")
         call.respond(sykmeldte)
@@ -23,6 +25,8 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
         val narmestelederId = call.parameters["narmestelederId"]!!
         val principal: BrukerPrincipal = call.authentication.principal()!!
         val fnr = principal.fnr
+        securelog.info("Mottak kall mot /api/v2/dinesykmeldte/{narmestelederId} for fnr: $fnr " +
+            "og narmestelederId: $narmestelederId")
         when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, fnr)) {
             null -> call.respond(HttpStatusCode.NotFound)
             else -> {
