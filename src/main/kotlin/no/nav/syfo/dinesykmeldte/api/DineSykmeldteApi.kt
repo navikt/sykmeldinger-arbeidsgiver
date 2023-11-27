@@ -25,8 +25,10 @@ fun Route.registerDineSykmeldteApi(dineSykmeldteService: DineSykmeldteService) {
         val narmestelederId = call.parameters["narmestelederId"]!!
         val principal: BrukerPrincipal = call.authentication.principal()!!
         val fnr = principal.fnr
-        securelog.info("Mottak kall mot /api/v2/dinesykmeldte/{narmestelederId} for fnr: $fnr " +
-            "og narmestelederId: $narmestelederId")
+        securelog.info(
+            "Mottak kall mot /api/v2/dinesykmeldte/{narmestelederId} for fnr: $fnr " +
+                "og narmestelederId: $narmestelederId"
+        )
         when (val sykmeldt = dineSykmeldteService.getSykmeldt(narmestelederId, fnr)) {
             null -> call.respond(HttpStatusCode.NotFound)
             else -> {
