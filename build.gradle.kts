@@ -16,8 +16,8 @@ val hikariVersion = "5.1.0"
 val flywayVersion = "10.13.0"
 val postgresVersion = "42.7.3"
 val testContainerVersion = "1.19.8"
-val kotlinVersion = "1.9.24"
-val swaggerUiVersion = "5.17.2"
+val kotlinVersion = "2.0.0"
+val swaggerUiVersion = "5.17.11"
 val commonsCodecVersion = "1.17.0"
 val ktfmtVersion = "0.44"
 val snakeYamlVersion = "2.2"
@@ -26,7 +26,7 @@ val snappyJavaVersion = "1.1.10.5"
 plugins {
     id("application")
     id("com.diffplug.spotless") version "6.25.0"
-    kotlin("jvm") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
 }
