@@ -15,17 +15,19 @@ val hikariVersion = "5.1.0"
 val flywayVersion = "10.17.0"
 val postgresVersion = "42.7.3"
 val testContainerVersion = "1.20.1"
-val kotlinVersion = "2.0.0"
+val kotlinVersion = "2.0.10"
 val swaggerUiVersion = "5.17.14"
 val commonsCodecVersion = "1.17.1"
 val ktfmtVersion = "0.44"
 val snakeYamlVersion = "2.2"
 val kafkaVersion = "3.8.0"
+val commonsCompressVersion = "1.26.2"
+
 
 plugins {
     id("application")
     id("com.diffplug.spotless") version "6.25.0"
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.0.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
 }
@@ -64,6 +66,7 @@ dependencies {
             because("override transient from io.ktor:ktor-client-apache")
         }
     }
+
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 
@@ -96,6 +99,11 @@ dependencies {
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.testcontainers:postgresql:$testContainerVersion")
+    constraints {
+        testImplementation("org.apache.commons:commons-compress:$commonsCompressVersion") {
+            because("overrides vulnerable dependency from org.testcontainers:postgresql")
+        }
+    }
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
