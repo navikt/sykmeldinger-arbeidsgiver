@@ -9,7 +9,6 @@ val logbackVersion = "1.5.6"
 val logstashEncoderVersion = "8.0"
 val prometheusVersion = "0.16.0"
 val kotestVersion = "5.9.1"
-val smCommonVersion = "2.0.8"
 val mockkVersion = "1.13.12"
 val nimbusdsVersion = "9.40"
 val hikariVersion = "5.1.0"
@@ -21,7 +20,7 @@ val swaggerUiVersion = "5.17.14"
 val commonsCodecVersion = "1.17.1"
 val ktfmtVersion = "0.44"
 val snakeYamlVersion = "2.2"
-val snappyJavaVersion = "1.1.10.5"
+val kafkaVersion = "3.8.0"
 
 plugins {
     id("application")
@@ -67,13 +66,10 @@ dependencies {
     }
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
-    implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
-    constraints {
-        implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion") {
-            because("override transient from org.apache.kafka:kafka_2.12")
-        }
-    }
-    implementation("no.nav.helse:syfosm-common-models:$smCommonVersion")
+
+    api("org.apache.kafka:kafka_2.12:$kafkaVersion")
+
+
     implementation("io.ktor:ktor-server-swagger:$ktorVersion")
 
     swaggerUI("org.webjars:swagger-ui:$swaggerUiVersion")
