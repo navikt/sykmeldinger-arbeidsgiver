@@ -13,9 +13,11 @@ import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
-import io.ktor.server.engine.ApplicationEngine
+import io.ktor.server.engine.EmbeddedServer
+import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.server.plugins.callid.CallId
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
@@ -38,13 +40,13 @@ fun createApplicationEngine(
     dineSykmeldteService: DineSykmeldteService,
     jwkProviderTokenX: JwkProvider,
     tokenXIssuer: String,
-): ApplicationEngine =
+): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> =
     embeddedServer(
         Netty,
-        env.applicationPort,
         configure = {
             // Increase timeout of Netty to handle large content bodies
             responseWriteTimeoutSeconds = 40
+            connector { port = env.applicationPort }
         }
     ) {
         install(ContentNegotiation) {

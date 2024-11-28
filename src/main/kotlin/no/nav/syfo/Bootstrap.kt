@@ -18,7 +18,8 @@ import io.ktor.client.request.get
 import io.ktor.network.sockets.SocketTimeoutException
 import io.ktor.serialization.jackson.jackson
 import io.prometheus.client.hotspot.DefaultExports
-import java.net.URL
+import java.net.URI
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -97,8 +98,8 @@ fun main() {
 
     val wellKnownTokenX = getWellKnownTokenX(httpClient, env.tokenXWellKnownUrl)
     val jwkProviderTokenX =
-        JwkProviderBuilder(URL(wellKnownTokenX.jwks_uri))
-            .cached(10, 24, TimeUnit.HOURS)
+        JwkProviderBuilder(URI.create(wellKnownTokenX.jwks_uri).toURL())
+            .cached(10, Duration.ofHours(24))
             .rateLimited(10, 1, TimeUnit.MINUTES)
             .build()
 
@@ -178,18 +179,6 @@ fun main() {
     DeleteSykmeldingService(database, leaderElection, applicationState).start()
     applicationServer.start()
 }
-
-fun getWellKnown(httpClient: HttpClient, wellKnownUrl: String) = runBlocking {
-    httpClient.get(wellKnownUrl).body<WellKnown>()
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class WellKnown(
-    val authorization_endpoint: String,
-    val token_endpoint: String,
-    val jwks_uri: String,
-    val issuer: String,
-)
 
 fun getWellKnownTokenX(httpClient: HttpClient, wellKnownUrl: String) = runBlocking {
     httpClient.get(wellKnownUrl).body<WellKnownTokenX>()
