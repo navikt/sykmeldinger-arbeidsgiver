@@ -5,10 +5,10 @@ version = "1.0.0"
 
 val javaVersion = JvmTarget.JVM_21
 
-val coroutinesVersion = "1.8.1"
+val coroutinesVersion = "1.9.0"
 val jacksonVersion = "2.17.2"
 val kluentVersion = "1.73"
-val ktorVersion = "3.0.1"
+val ktorVersion = "3.0.2"
 val logbackVersion = "1.5.6"
 val logstashEncoderVersion = "8.0"
 val prometheusVersion = "0.16.0"
@@ -26,8 +26,6 @@ val ktfmtVersion = "0.44"
 val kafkaVersion = "3.8.0"
 
 ///Due to vulnerabilities
-val snakeYamlVersion = "2.2"
-val nettycommonVersion = "4.1.115.Final"
 val commonsCompressVersion = "1.26.2"
 
 
@@ -35,7 +33,7 @@ plugins {
     id("application")
     id("com.diffplug.spotless") version "6.25.0"
     kotlin("jvm") version "2.1.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.5"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
 }
 
@@ -60,11 +58,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    constraints {
-        implementation("io.netty:netty-common:$nettycommonVersion") {
-            because("Due to vulnerabilities in io.ktor:ktor-server-netty")
-        }
-    }
+
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
@@ -84,7 +78,6 @@ dependencies {
 
     api("org.apache.kafka:kafka_2.12:$kafkaVersion")
 
-
     implementation("io.ktor:ktor-server-swagger:$ktorVersion")
 
     swaggerUI("org.webjars:swagger-ui:$swaggerUiVersion")
@@ -99,13 +92,6 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
-
-
-    constraints {
-        implementation("org.yaml:snakeyaml:$snakeYamlVersion") {
-            because("override transient version")
-        }
-    }
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("org.amshove.kluent:kluent:$kluentVersion")
