@@ -5,33 +5,33 @@ version = "1.0.0"
 
 val javaVersion = JvmTarget.JVM_21
 
-val coroutinesVersion = "1.9.0"
+val coroutinesVersion = "1.10.1"
 val jacksonVersion = "2.17.2"
 val kluentVersion = "1.73"
-val ktorVersion = "3.0.2"
-val logbackVersion = "1.5.6"
+val ktorVersion = "3.0.3"
+val logbackVersion = "1.5.16"
 val logstashEncoderVersion = "8.0"
 val prometheusVersion = "0.16.0"
 val kotestVersion = "5.9.1"
-val mockkVersion = "1.13.12"
-val nimbusdsVersion = "9.40"
-val hikariVersion = "5.1.0"
-val flywayVersion = "10.17.0"
-val postgresVersion = "42.7.3"
-val testContainerVersion = "1.20.1"
+val mockkVersion = "1.13.16"
+val nimbusdsVersion = "10.0.1"
+val hikariVersion = "6.2.1"
+val flywayVersion = "11.1.1"
+val postgresVersion = "42.7.5"
+val testContainerVersion = "1.20.4"
 val kotlinVersion = "2.1.0"
 val swaggerUiVersion = "5.17.14"
 val commonsCodecVersion = "1.17.1"
 val ktfmtVersion = "0.44"
-val kafkaVersion = "3.8.0"
+val kafkaVersion = "3.9.0"
 
 ///Due to vulnerabilities
-val commonsCompressVersion = "1.26.2"
+val commonsCompressVersion = "1.27.1"
 
 
 plugins {
     id("application")
-    id("com.diffplug.spotless") version "6.25.0"
+    id("com.diffplug.spotless") version "7.0.2"
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
