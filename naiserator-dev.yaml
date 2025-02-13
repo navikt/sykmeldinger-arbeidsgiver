@@ -64,8 +64,8 @@ spec:
     limits:
       memory: 1Gi
     requests:
-      cpu: 50m
-      memory: 500Mi
+      cpu: 30m
+      memory: 450Mi
   ingresses:
     - "https://sykmeldinger-arbeidsgiver.intern.dev.nav.no"
   kafka:

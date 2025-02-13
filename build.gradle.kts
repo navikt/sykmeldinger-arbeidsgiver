@@ -8,7 +8,7 @@ val javaVersion = JvmTarget.JVM_21
 val coroutinesVersion = "1.10.1"
 val jacksonVersion = "2.17.2"
 val kluentVersion = "1.73"
-val ktorVersion = "3.0.3"
+val ktorVersion = "3.1.0"
 val logbackVersion = "1.5.16"
 val logstashEncoderVersion = "8.0"
 val prometheusVersion = "0.16.0"
@@ -19,7 +19,7 @@ val hikariVersion = "6.2.1"
 val flywayVersion = "11.1.1"
 val postgresVersion = "42.7.5"
 val testContainerVersion = "1.20.4"
-val kotlinVersion = "2.1.0"
+val kotlinVersion = "2.1.10"
 val swaggerUiVersion = "5.17.14"
 val commonsCodecVersion = "1.17.1"
 val ktfmtVersion = "0.44"
@@ -32,8 +32,8 @@ val commonsCompressVersion = "1.27.1"
 plugins {
     id("application")
     id("com.diffplug.spotless") version "7.0.2"
-    kotlin("jvm") version "2.1.0"
-    id("com.gradleup.shadow") version "8.3.5"
+    kotlin("jvm") version "2.1.10"
+    id("com.gradleup.shadow") version "8.3.6"
     id("org.hidetake.swagger.generator") version "2.19.2" apply true
 }
 
