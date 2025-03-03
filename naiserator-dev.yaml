@@ -20,9 +20,6 @@ spec:
         - application: dialogmote-frontend
           namespace: team-esyfo
           cluster: dev-gcp
-        - application: syfobrukertilgang
-          namespace: team-esyfo
-          cluster: dev-gcp
   gcp:
     sqlInstances:
       - name: sykmeldinger-arbeidsgiver-instance
