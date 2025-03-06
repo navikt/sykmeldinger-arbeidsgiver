@@ -1,6 +1,8 @@
 [![Deploy to dev and prod](https://github.com/navikt/sykmeldinger-arbeidsgiver/actions/workflows/deploy.yml/badge.svg)](https://github.com/navikt/sykmeldinger-arbeidsgiver/actions/workflows/deploy.yml)
 
 # sykmeldinger-arbeidsgiver
+
+This repo is archived, the functionality has been moved to dinesykmeldte-backend
 This project contains the application code and infrastructure for sykmeldinger-arbeidsgiver
 
 ## Technologies used
